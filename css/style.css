@@ -169,6 +169,20 @@ h1, h2, h3, h4 { font-weight: 700; color: var(--slate-900); }
 .feature-box p { color: var(--slate-600); font-size: 0.95rem; }
 
 /* Dashboard SAAS Preview */
+.dashboard-page {
+    margin: 0;
+    padding: 0;
+    background: var(--slate-50);
+    height: 100vh;
+    overflow: hidden;
+}
+.dashboard-page .saas-dashboard {
+    height: 100vh;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+}
+
 .saas-dashboard { background: white; border-radius: 20px; border: 1px solid var(--slate-200); box-shadow: var(--shadow-xl); display: flex; overflow: hidden; height: 750px; }
 
 .dash-sidebar { width: 260px; background: var(--slate-50); border-right: 1px solid var(--slate-200); display: flex; flex-direction: column; }

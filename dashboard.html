@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng điều khiển - Sổ tay Nông dân số</title>
+    <!-- Fonts: Inter for professional SaaS look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="dashboard-page">
+    <div class="saas-dashboard">
+        <!-- Sidebar -->
+        <aside class="dash-sidebar">
+            <div class="dash-profile">
+                <img src="https://images.unsplash.com/photo-1599839619722-39751411ea63?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Avatar">
+                <div>
+                    <strong id="user-name-display">Nguyễn Văn A</strong>
+                    <span class="badge badge-farmer" id="user-role-display">Nông dân</span>
+                </div>
+            </div>
+            <nav class="dash-nav">
+                <a href="dashboard.html" class="active"><i class="fa-solid fa-house"></i> Tổng quan</a>
+                <a href="#"><i class="fa-solid fa-cloud-sun-rain"></i> Thời tiết & Môi trường</a>
+                <a href="#"><i class="fa-solid fa-seedling"></i> Nhật ký canh tác</a>
+                <a href="#"><i class="fa-solid fa-chart-line"></i> Thị trường & Giá</a>
+                <a href="#"><i class="fa-solid fa-handshake"></i> Đơn vị thu mua</a>
+                <a href="#"><i class="fa-solid fa-book"></i> Cẩm nang Kỹ thuật</a>
+            </nav>
+            <div style="margin-top: auto; padding: 20px 12px;">
+                <a href="index.html" id="logout-btn" style="color: var(--red-500); text-decoration: none; display: flex; align-items: center; gap: 12px; padding: 10px 16px; font-weight: 500;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất</a>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="dash-main">
+            <!-- Topbar -->
+            <header class="dash-topbar">
+                <div class="page-title">
+                    <h3>Bảng Tổng Quan</h3>
+                    <p>Hôm nay, <span id="current-date">--/--/----</span></p>
+                </div>
+                <div class="dash-controls">
+                    <div class="control-group">
+                        <label><i class="fa-solid fa-location-dot"></i> Vùng canh tác:</label>
+                        <select id="dash-location" class="dash-select">
+                            <option value="10.45,105.63,Đồng Tháp">Đồng Tháp</option>
+                            <option value="10.03,105.78,Cần Thơ">Cần Thơ</option>
+                            <option value="11.94,108.45,Lâm Đồng">Lâm Đồng</option>
+                            <option value="21.02,105.83,Hà Nội">Hà Nội</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label><i class="fa-solid fa-leaf"></i> Nông sản quan tâm:</label>
+                        <select id="dash-product" class="dash-select">
+                            <option value="lua">Lúa IR50404</option>
+                            <option value="caphe">Cà phê Robusta</option>
+                            <option value="saurieng">Sầu Riêng Ri6</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-icon"><i class="fa-solid fa-bell"></i><span class="notify-dot"></span></button>
+                </div>
+            </header>
+            
+            <!-- Dashboard Widgets Grid -->
+            <div class="dash-grid">
+                <!-- Widget 1: Weather Live -->
+                <div class="widget w-weather">
+                    <div class="widget-head">
+                        <h4><i class="fa-solid fa-cloud-sun text-emerald"></i> Khí hậu hiện tại</h4>
+                        <span class="live-dot">Live</span>
+                    </div>
+                    <div class="weather-display">
+                        <div class="w-main">
+                            <i id="dash-weather-icon" class="fa-solid fa-sun weather-icon-large"></i>
+                            <div class="w-temp">
+                                <span id="dash-temp">--</span>°C
+                                <small id="dash-weather-desc">Đang tải...</small>
+                            </div>
+                        </div>
+                        <div class="w-details">
+                            <div><span>Độ ẩm:</span> <strong>85%</strong></div>
+                            <div><span>Gió:</span> <strong id="dash-wind">-- km/h</strong></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Widget 2: Chart -->
+                <div class="widget w-chart">
+                    <div class="widget-head">
+                        <h4><i class="fa-solid fa-chart-area text-blue"></i> Biến động Giá</h4>
+                        <select class="dash-select-mini">
+                            <option>7 Ngày qua</option>
+                            <option>30 Ngày qua</option>
+                        </select>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="dashPriceChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Widget 3: AI Recommendations -->
+                <div class="widget w-ai">
+                    <div class="widget-head">
+                        <h4><i class="fa-solid fa-robot text-purple"></i> Khuyến nghị AI</h4>
+                    </div>
+                    <ul class="ai-feed" id="dash-ai-feed">
+                        <!-- Populated by JS -->
+                        <li class="feed-item warning">
+                            <div class="feed-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                            <div class="feed-content">
+                                <strong>Cảnh báo (Đồng Tháp)</strong>
+                                <p>Độ ẩm cao >80%, nguy cơ Bệnh đạo ôn cho Lúa phát triển mạnh. Khuyến nghị phun phòng ngừa.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Widget 4: Market Connection -->
+                <div class="widget w-market">
+                    <div class="widget-head">
+                        <h4><i class="fa-solid fa-truck-fast text-orange"></i> Lệnh thu mua mới</h4>
+                        <a href="#" style="font-size:0.8rem; color:var(--emerald-600);">Xem tất cả</a>
+                    </div>
+                    <div class="market-list" id="dash-market-list">
+                        <!-- Populated by JS -->
+                        <div class="market-item">
+                            <div class="mi-avatar">CT</div>
+                            <div class="mi-info">
+                                <strong>Cty CP Nông Nghiệp VN</strong>
+                                <span>Thu mua 500 Tấn - Lúa IR50404</span>
+                                <small><i class="fa-solid fa-sack-dollar"></i> Giá thỏa thuận: 7,650đ/kg</small>
+                            </div>
+                            <button class="btn btn-sm btn-outline-emerald">Nhắn tin</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Custom Script -->
+    <script src="js/script.js"></script>
+</body>
+</html>
