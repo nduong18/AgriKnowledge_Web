@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký - Sổ tay Nông dân số</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-page">
+    <a href="index.html" class="auth-back"><i class="fa-solid fa-arrow-left"></i> Quay lại trang chủ</a>
+    
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="brand-icon" style="margin: 0 auto 16px;"><i class="fa-solid fa-leaf"></i></div>
+            <h2>Đăng ký tài khoản</h2>
+            <p>Tham gia cộng đồng Nông nghiệp xanh</p>
+        </div>
+        
+        <form action="login.html" method="GET" style="display: flex; flex-direction: column; gap: 20px;">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" class="form-control" placeholder="nhapemail@example.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Mật khẩu</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+                    <i class="fa-regular fa-eye password-toggle"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm-password">Xác nhận Mật khẩu</label>
+                <div class="password-wrapper">
+                    <input type="password" id="confirm-password" class="form-control" placeholder="••••••••" required>
+                    <i class="fa-regular fa-eye password-toggle"></i>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px; padding: 14px;">Đăng ký miễn phí</button>
+        </form>
+        
+        <div class="auth-footer">
+            Đã có tài khoản? <a href="login.html">Đăng nhập</a>
+        </div>
+    </div>
+    
+    <!-- Custom Script -->
+    <script src="js/script.js"></script>
+</body>
+</html>

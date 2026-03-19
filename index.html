@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sổ tay Nông dân số - Nền tảng Hỗ trợ Nông nghiệp Thông minh</title>
+    <!-- Fonts: Inter for professional SaaS look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="container nav-wrapper">
+            <a href="#" class="brand">
+                <div class="brand-icon"><i class="fa-solid fa-leaf"></i></div>
+                <div class="brand-text">
+                    <strong>Nông Dân Số</strong>
+                    <span>Sổ tay thông minh</span>
+                </div>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="#features">Tính năng cốt lõi</a></li>
+                <li><a href="#dashboard-preview">Trải nghiệm Nền tảng</a></li>
+                <li><a href="#knowledge-graph">Đồ thị Tri thức AI</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="login.html" class="btn btn-ghost">Đăng nhập</a>
+                <a href="register.html" class="btn btn-primary">Bắt đầu miễn phí</a>
+            </div>
+            <button class="menu-toggle"><i class="fa-solid fa-bars"></i></button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero-bg-pattern"></div>
+        <div class="container hero-container">
+            <div class="hero-content">
+                <div class="badge-new">
+                    <span class="badge-tag">Mới</span> Giải pháp toàn diện cho chuỗi cung ứng Nông Lâm Sản
+                </div>
+                <h1 class="hero-title">
+                    Hệ thống Hỗ trợ ra quyết định <br>
+                    <span class="text-gradient">Trong Canh tác & Tiêu thụ</span>
+                </h1>
+                <p class="hero-desc">
+                    Nền tảng "Sổ tay Nông dân số" tổng hợp thông tin thời tiết, giá cả thị trường, kỹ thuật canh tác và kết nối trực tiếp người nông dân với thương lái/doanh nghiệp trên một giao diện hợp nhất.
+                </p>
+                <div class="hero-cta">
+                    <a href="#dashboard-preview" class="btn btn-primary btn-lg">Trải nghiệm hệ thống <i class="fa-solid fa-arrow-right"></i></a>
+                    <a href="#features" class="btn btn-outline btn-lg">Xem chi tiết tính năng</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <strong>Live API</strong>
+                        <span>Thời tiết & Giá cả</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <strong>Neo4j Graph</strong>
+                        <span>AI Khuyến nghị</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <strong>B2B & B2C</strong>
+                        <span>Kết nối trực tiếp</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <!-- Floating Elements representing the 4 pillars -->
+                <div class="floating-card c-weather anim-float-1">
+                    <i class="fa-solid fa-cloud-sun text-emerald"></i>
+                    <div>
+                        <small>Thời tiết hiện tại</small>
+                        <strong id="hero-weather">Đang tải...</strong>
+                    </div>
+                </div>
+                <div class="floating-card c-price anim-float-2">
+                    <i class="fa-solid fa-chart-line text-blue"></i>
+                    <div>
+                        <small>Lúa IR50404</small>
+                        <strong>7,600đ/kg <span class="text-emerald"><i class="fa-solid fa-arrow-trend-up"></i> 1.2%</span></strong>
+                    </div>
+                </div>
+                <div class="floating-card c-ai anim-float-3">
+                    <i class="fa-solid fa-brain text-purple"></i>
+                    <div>
+                        <small>Khuyến nghị canh tác</small>
+                        <strong>Nguy cơ rầy nâu thấp</strong>
+                    </div>
+                </div>
+                <!-- Main Dashboard Mockup Graphic -->
+                <div class="hero-mockup-img"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Core Features / Pillars -->
+    <section id="features" class="section bg-slate">
+        <div class="container">
+            <div class="section-heading text-center">
+                <h2 class="title">4 Trụ Cột Của Sổ Tay Nông Dân Số</h2>
+                <p class="subtitle">Giải quyết triệt để sự đứt gãy thông tin và tối ưu hóa lợi nhuận cho người nông dân.</p>
+            </div>
+            
+            <div class="feature-grid">
+                <!-- M1: Weather & Environment -->
+                <div class="feature-box">
+                    <div class="fb-icon bg-emerald-light text-emerald"><i class="fa-solid fa-temperature-half"></i></div>
+                    <h3>Cảnh báo Môi trường & Thời tiết</h3>
+                    <p>Tích hợp dữ liệu khí tượng thực tế. Dự báo thời tiết 7 ngày tới, độ ẩm đất, lượng mưa. Tự động phát đi cảnh báo sương muối, hạn mặn, giông lốc dựa trên tọa độ canh tác (GPS).</p>
+                </div>
+                <!-- M2: Price & Market -->
+                <div class="feature-box">
+                    <div class="fb-icon bg-blue-light text-blue"><i class="fa-solid fa-chart-column"></i></div>
+                    <h3>Giá cả & Xu hướng Thị trường</h3>
+                    <p>Hệ thống tự động rà quét (crawler) và trực quan hóa giá nông lâm sản mỗi ngày. Cung cấp biểu đồ phân tích xu hướng để nông dân quyết định thời điểm thu hoạch mấu chốt.</p>
+                </div>
+                <!-- M3: Knowledge & Tech -->
+                <div class="feature-box">
+                    <div class="fb-icon bg-purple-light text-purple"><i class="fa-solid fa-book-journal-whills"></i></div>
+                    <h3>Kỹ thuật & Đồ thị Tri thức AI</h3>
+                    <p>Số hóa kho tàng kinh nghiệm nông nghiệp thành Đồ thị tri thức (Knowledge Graph). Gợi ý cách bón phân, phòng bệnh chuẩn xác dựa theo loại cây và điều kiện khắc nghiệt thực tại.</p>
+                </div>
+                <!-- M4: Marketplace & Connection -->
+                <div class="feature-box">
+                    <div class="fb-icon bg-orange-light text-orange"><i class="fa-solid fa-store"></i></div>
+                    <h3>Sàn giao dịch & Kết nối Cung Cầu</h3>
+                    <p>Mô hình thương mại rút gọn khâu trung gian. Nông dân đăng bán sản lượng dự kiến; Doanh nghiệp, thương lái tìm kiếm, thỏa thuận giá và chốt hợp đồng thu mua trực tiếp bằng 1 click.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Dashboard Preview Section -->
+    <section id="dashboard-preview" class="section">
+        <div class="container">
+            <div class="section-heading text-center mb-50">
+                <h2 class="title">Trải Nghiệm Trực Quan Giao Diện Nền Tảng</h2>
+                <p class="subtitle">Tất cả thông tin được tổng hợp trên một bảng điều khiển (Dashboard) duy nhất, minh bạch và theo thời gian thực.</p>
+            </div>
+
+            <div class="saas-dashboard">
+                <!-- Sidebar -->
+                <aside class="dash-sidebar">
+                    <div class="dash-profile">
+                        <img src="https://images.unsplash.com/photo-1599839619722-39751411ea63?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Avatar">
+                        <div>
+                            <strong>Nguyễn Văn A</strong>
+                            <span class="badge badge-farmer">Nông dân</span>
+                        </div>
+                    </div>
+                    <nav class="dash-nav">
+                        <a href="#" class="active"><i class="fa-solid fa-house"></i> Tổng quan</a>
+                        <a href="#"><i class="fa-solid fa-cloud-sun-rain"></i> Thời tiết & Môi trường</a>
+                        <a href="#"><i class="fa-solid fa-seedling"></i> Nhật ký canh tác</a>
+                        <a href="#"><i class="fa-solid fa-chart-line"></i> Thị trường & Giá</a>
+                        <a href="#"><i class="fa-solid fa-handshake"></i> Đơn vị thu mua</a>
+                        <a href="#"><i class="fa-solid fa-book"></i> Cẩm nang Kỹ thuật</a>
+                    </nav>
+                </aside>
+                
+                <!-- Main Content -->
+                <main class="dash-main">
+                    <!-- Topbar -->
+                    <header class="dash-topbar">
+                        <div class="page-title">
+                            <h3>Bảng Tổng Quan</h3>
+                            <p>Hôm nay, <span id="current-date">--/--/----</span></p>
+                        </div>
+                        <div class="dash-controls">
+                            <div class="control-group">
+                                <label><i class="fa-solid fa-location-dot"></i> Vùng canh tác:</label>
+                                <select id="dash-location" class="dash-select">
+                                    <option value="10.45,105.63,Đồng Tháp">Đồng Tháp</option>
+                                    <option value="10.03,105.78,Cần Thơ">Cần Thơ</option>
+                                    <option value="11.94,108.45,Lâm Đồng">Lâm Đồng</option>
+                                    <option value="21.02,105.83,Hà Nội">Hà Nội</option>
+                                </select>
+                            </div>
+                            <div class="control-group">
+                                <label><i class="fa-solid fa-leaf"></i> Nông sản quan tâm:</label>
+                                <select id="dash-product" class="dash-select">
+                                    <option value="lua">Lúa IR50404</option>
+                                    <option value="caphe">Cà phê Robusta</option>
+                                    <option value="saurieng">Sầu Riêng Ri6</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-icon"><i class="fa-solid fa-bell"></i><span class="notify-dot"></span></button>
+                        </div>
+                    </header>
+                    
+                    <!-- Dashboard Widgets Grid -->
+                    <div class="dash-grid">
+                        <!-- Widget 1: Weather Live -->
+                        <div class="widget w-weather">
+                            <div class="widget-head">
+                                <h4><i class="fa-solid fa-cloud-sun text-emerald"></i> Khí hậu hiện tại</h4>
+                                <span class="live-dot">Live</span>
+                            </div>
+                            <div class="weather-display">
+                                <div class="w-main">
+                                    <i id="dash-weather-icon" class="fa-solid fa-sun weather-icon-large"></i>
+                                    <div class="w-temp">
+                                        <span id="dash-temp">--</span>°C
+                                        <small id="dash-weather-desc">Đang tải...</small>
+                                    </div>
+                                </div>
+                                <div class="w-details">
+                                    <div><span>Độ ẩm:</span> <strong>85%</strong></div>
+                                    <div><span>Gió:</span> <strong id="dash-wind">-- km/h</strong></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Widget 2: Chart -->
+                        <div class="widget w-chart">
+                            <div class="widget-head">
+                                <h4><i class="fa-solid fa-chart-area text-blue"></i> Biến động Giá</h4>
+                                <select class="dash-select-mini">
+                                    <option>7 Ngày qua</option>
+                                    <option>30 Ngày qua</option>
+                                </select>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="dashPriceChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Widget 3: AI Recommendations -->
+                        <div class="widget w-ai">
+                            <div class="widget-head">
+                                <h4><i class="fa-solid fa-robot text-purple"></i> Khuyến nghị AI</h4>
+                            </div>
+                            <ul class="ai-feed" id="dash-ai-feed">
+                                <!-- Populated by JS -->
+                                <li class="feed-item warning">
+                                    <div class="feed-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                                    <div class="feed-content">
+                                        <strong>Cảnh báo (Đồng Tháp)</strong>
+                                        <p>Độ ẩm cao >80%, nguy cơ Bệnh đạo ôn cho Lúa phát triển mạnh. Khuyến nghị phun phòng ngừa.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Widget 4: Market Connection -->
+                        <div class="widget w-market">
+                            <div class="widget-head">
+                                <h4><i class="fa-solid fa-truck-fast text-orange"></i> Lệnh thu mua mới</h4>
+                                <a href="#" style="font-size:0.8rem; color:var(--emerald-600);">Xem tất cả</a>
+                            </div>
+                            <div class="market-list" id="dash-market-list">
+                                <!-- Populated by JS -->
+                                <div class="market-item">
+                                    <div class="mi-avatar">CT</div>
+                                    <div class="mi-info">
+                                        <strong>Cty CP Nông Nghiệp VN</strong>
+                                        <span>Thu mua 500 Tấn - Lúa IR50404</span>
+                                        <small><i class="fa-solid fa-sack-dollar"></i> Giá thỏa thuận: 7,650đ/kg</small>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-emerald">Nhắn tin</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <!-- Knowledge Graph Technical Explanation Section -->
+    <section id="knowledge-graph" class="section bg-slate border-top">
+        <div class="container">
+            <div class="split-layout">
+                <div class="split-content text-left">
+                    <span class="badge badge-purple mb-15">LÕI CÔNG NGHỆ NE04J</span>
+                    <h2 class="title" style="margin-bottom: 20px;">Xử Lý Ngôn Ngữ & Đồ Thị Tri Thức</h2>
+                    <p class="desc">
+                        Hệ thống không lưu trữ kinh nghiệm nông nghiệp dưới dạng văn bản chết. "Sổ tay Nông dân số" áp dụng <strong>Knowledge Graph</strong> để định hình các mảng khái niệm (Ontology), móc nối logic giữa: 
+                        <span class="text-emerald font-semibold">Cây trồng</span> ↔ 
+                        <span class="text-emerald font-semibold">Sâu bệnh</span> ↔ 
+                        <span class="text-emerald font-semibold">Đặc điểm thổ nhưỡng</span> ↔
+                        <span class="text-emerald font-semibold">Giải pháp đặc trị</span>.
+                    </p>
+                    <ul class="tech-list mt-30">
+                        <li><i class="fa-solid fa-circle-check text-purple"></i> Chuẩn đoán chính xác: Nhập dấu hiệu bệnh, AI truy vết biểu đồ, ra kết luận chỉ trong vài mili-giây.</li>
+                        <li><i class="fa-solid fa-circle-check text-purple"></i> Bản địa hóa: Phân loại giải pháp dựa trên vị trí địa lý của bạn (đại lý thuốc nào gần nhất có bán).</li>
+                        <li><i class="fa-solid fa-circle-check text-purple"></i> CSDL Graph (Neo4j) thay thế RDBMS truyền thống giúp truy vấn mạng lưới đa chiều.</li>
+                    </ul>
+                </div>
+                
+                <!-- KG Visualization Interactive Widget -->
+                <div class="split-visual kg-interactive-box">
+                    <div class="kg-query-box">
+                        <i class="fa-solid fa-terminal"></i> <span>QUERY: MATCH (c:Cây_Trồng)-[:MẮC_BỆNH]->(b:Bệnh)-[:GIẢI_PHÁP]->(g:Thuốc) RETURN c,b,g</span>
+                    </div>
+                    <div class="kg-graph-canvas" id="graph-container">
+                        <div class="node node-primary" style="top:50%; left:20%;">Lúa IR50404</div>
+                        <div class="node node-danger pulse-anim" style="top:20%; left:50%;">Bệnh Vàng Lá</div>
+                        <div class="node node-danger pulse-anim" style="top:80%; left:50%;">Rầy Nâu</div>
+                        <div class="node node-success" style="top:20%; left:85%;">Thuốc Đặc Trị A</div>
+                        <div class="node node-success" style="top:80%; left:85%;">Thuốc Phun B</div>
+                        
+                        <!-- SVG Lines for Connections -->
+                        <svg class="kg-edges">
+                            <line x1="20%" y1="50%" x2="50%" y2="20%" class="edge anim-edge"/>
+                            <text x="35%" y="30%" class="edge-text">MẮC_BỆNH</text>
+                            
+                            <line x1="20%" y1="50%" x2="50%" y2="80%" class="edge anim-edge"/>
+                            <text x="35%" y="70%" class="edge-text">DỄ_BỊ</text>
+                            
+                            <line x1="50%" y1="20%" x2="85%" y2="20%" class="edge-solid"/>
+                            <text x="67%" y="15%" class="edge-text text-success">GIẢI_PHÁP_TỐI_ƯU</text>
+                            
+                            <line x1="50%" y1="80%" x2="85%" y2="80%" class="edge-solid"/>
+                            <text x="67%" y="75%" class="edge-text text-success">CÁCH_PHÒNG</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="footer">
+        <div class="container footer-wrapper">
+            <div class="footer-brand">
+                <a href="#" class="brand text-white">
+                    <div class="brand-icon"><i class="fa-solid fa-leaf"></i></div>
+                    <div class="brand-text">
+                        <strong>Nông Dân Số</strong>
+                        <span style="color:var(--slate-400)">Sổ tay thông minh</span>
+                    </div>
+                </a>
+                <p class="mt-20 desc">Giải pháp công nghệ nhằm hỗ trợ quá trình ra quyết định, minh bạch hóa thị trường và kết nối trực tiếp cung cầu nông sản Việt Nam.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Hệ thống</h4>
+                <ul>
+                    <li><a href="#">Thời tiết & Cảnh báo</a></li>
+                    <li><a href="#">Thị trường Nông sản</a></li>
+                    <li><a href="#">Đồ thị kỹ thuật (AI)</a></li>
+                    <li><a href="#">Sàn giao thương mại</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Dành cho</h4>
+                <ul>
+                    <li><a href="#">Người nông dân (App)</a></li>
+                    <li><a href="#">Thương lái (Web)</a></li>
+                    <li><a href="#">Huyển/Xã (Admin)</a></li>
+                </ul>
+            </div>
+            <div class="footer-contact">
+                <h4>Báo cáo Thực tập cơ sở</h4>
+                <p><i class="fa-solid fa-school"></i> Học viện Công nghệ Bưu chính Viễn thông</p>
+                <p><i class="fa-solid fa-file-contract"></i> Đề tài: Hệ thống hỗ trợ ra quyết định nông nghiệp</p>
+                <p><i class="fa-solid fa-envelope"></i> contact@nongdanso.vn</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p>&copy; 2026 Sổ tay Nông dân số. Phát triển dựa trên kiến trúc Web & Knowledge Graph.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom Script -->
+    <script src="js/script.js"></script>
+</body>
+</html>
