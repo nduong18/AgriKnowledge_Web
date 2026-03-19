@@ -116,7 +116,7 @@
                 return;
             } else {
                 if(document.getElementById('user-name-display')) {
-                    document.getElementById('user-name-display').innerText = user.email.split('@')[0];
+                    document.getElementById('user-name-display').innerText = user.display_name || (user.email ? user.email.split('@')[0] : 'Administrator');
                 }
             }
             

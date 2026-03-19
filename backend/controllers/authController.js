@@ -4,7 +4,7 @@ const db = require('../config/db');
 
 exports.register = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, display_name } = req.body;
         if (!email || !password) {
             return res.status(400).json({ error: 'Email và mật khẩu không được để trống' });
         }
@@ -16,8 +16,9 @@ exports.register = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const role = 'farmer'; // Mặc định tự đăng ký là farmer
+        const validDisplayName = display_name || 'Nông dân mới';
 
-        await db.query('INSERT INTO users (email, password, role) VALUES (?, ?, ?)', [email, hashedPassword, role]);
+        await db.query('INSERT INTO users (email, password, display_name, role) VALUES (?, ?, ?, ?)', [email, hashedPassword, validDisplayName, role]);
         res.status(201).json({ message: 'Đăng ký thành công!' });
     } catch (error) {
         console.error('Lỗi đăng ký:', error);
@@ -45,7 +46,7 @@ exports.login = async (req, res) => {
         }
 
         const token = jwt.sign(
-            { id: user.id, email: user.email, role: user.role },
+            { id: user.id, email: user.email, role: user.role, display_name: user.display_name },
             process.env.JWT_SECRET || 'fallback_secret',
             { expiresIn: '24h' }
         );
@@ -56,7 +57,8 @@ exports.login = async (req, res) => {
             user: {
                 id: user.id,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                display_name: user.display_name
             }
         });
     } catch (error) {
@@ -68,12 +70,14 @@ exports.login = async (req, res) => {
 // Dùng tạm để tạo sẵn 1 account Admin nhanh
 exports.createAdmin = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, display_name } = req.body;
         const [existing] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
         if (existing.length > 0) return res.status(400).json({ error: 'Email trùng lặp' });
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        await db.query('INSERT INTO users (email, password, role) VALUES (?, ?, ?)', [email, hashedPassword, 'admin']);
+        const validName = display_name || 'Quản trị viên';
+        
+        await db.query('INSERT INTO users (email, password, display_name, role) VALUES (?, ?, ?, ?)', [email, hashedPassword, validName, 'admin']);
         res.status(201).json({ message: 'Đã tạo tài khoản admin thành công!' });
     } catch(err) {
         res.status(500).json({ error: err.message });

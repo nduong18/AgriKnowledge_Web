@@ -32,11 +32,17 @@ async function initDB() {
             id INT AUTO_INCREMENT PRIMARY KEY,
             email VARCHAR(255) UNIQUE NOT NULL,
             password VARCHAR(255) NOT NULL,
+            display_name VARCHAR(255) DEFAULT 'Người dùng mới',
             role ENUM('farmer', 'admin') DEFAULT 'farmer',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         `;
         await pool.query(createUsersTableCmd);
+
+        // Auto-migrate to add display_name if table was already created before
+        try {
+            await pool.query("ALTER TABLE users ADD COLUMN display_name VARCHAR(255) DEFAULT 'Người dùng mới'");
+        } catch(e) { /* Lỗi Duplicate column tức là cột đã tồn tại, có thể bỏ qua */ }
         
         console.log('✅ Cơ sở dữ liệu MySQL và bảng users đã sẵn sàng.');
     } catch (error) {

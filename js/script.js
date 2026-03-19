@@ -268,45 +268,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 7. Simulated Authentication Logic
-    const loginForm = document.getElementById('login-form');
-    if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            if (email === 'duonghocbai18@gmail.com' && password === '1') {
-                localStorage.setItem('currentUser', JSON.stringify({
-                    name: 'Dương Học Bài',
-                    role: 'Nông dân',
-                    email: email
-                }));
-                window.location.href = 'dashboard.html';
-            }
-        });
-    }
 
-    // 8. Update Dashboard User Info
-    const userNameDisplay = document.getElementById('user-name-display');
-    const userRoleDisplay = document.getElementById('user-role-display');
-    if (userNameDisplay && userRoleDisplay) {
-        const storedUser = localStorage.getItem('currentUser');
-        if (storedUser) {
-            const user = JSON.parse(storedUser);
-            userNameDisplay.textContent = user.name;
-            userRoleDisplay.textContent = user.role;
-        } else {
-            // Uncomment to force login
-            // window.location.href = 'login.html';
-        }
-    }
-
-    // 9. Logout Logic
-    const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            localStorage.removeItem('currentUser');
-        });
-    }
 });

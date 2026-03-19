@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm-password').value;
+            const displayName = document.getElementById('display-name') ? document.getElementById('display-name').value : undefined;
 
             if (password !== confirmPassword) {
                 alert('Mật khẩu xác nhận không khớp!');
@@ -53,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const response = await fetch(`${API_URL}/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify({ email, password, display_name: displayName })
                 });
 
                 const data = await response.json();
