@@ -137,29 +137,40 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 4. Setup Chart.js with Mock SAAS Data
+    // 4. Setup Chart.js with API Data
     let priceChart;
-    const productsData = {
-        'lua': { label: 'Giá Lúa IR50404 (VNĐ)', data: [7200, 7250, 7150, 7300, 7500, 7520, 7600], color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.1)', min: 7000 },
-        'caphe': { label: 'Cà phê Robusta (VNĐ)', data: [95000, 96000, 97500, 97000, 99000, 101000, 103000], color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.1)', min: 90000 },
-        'saurieng': { label: 'Sầu Riêng Ri6 (VNĐ)', data: [85000, 83000, 82000, 84000, 86000, 88000, 90000], color: '#f97316', bg: 'rgba(249, 115, 22, 0.1)', min: 75000 }
+    let productsData = {};
+
+    const loadPriceData = async () => {
+        try {
+            const res = await fetch('http://localhost:3000/api/prices');
+            productsData = await res.json();
+            initChart();
+        } catch (error) {
+            console.error('Lỗi API giá:', error);
+        }
     };
 
     const ctx = document.getElementById('dashPriceChart');
-    if (ctx) {
+    const initChart = () => {
+        if (!ctx) return;
+        const initialProduct = document.getElementById('dash-product')?.value || 'lua';
+        const info = productsData[initialProduct] || Object.values(productsData)[0];
+        if (!info) return;
+
         Chart.defaults.font.family = "'Inter', sans-serif";
         priceChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+                labels: info.dates || ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
                 datasets: [{
-                    label: productsData['lua'].label,
-                    data: productsData['lua'].data,
-                    borderColor: productsData['lua'].color,
-                    backgroundColor: productsData['lua'].bg,
+                    label: info.label,
+                    data: info.data,
+                    borderColor: info.color,
+                    backgroundColor: info.bg,
                     borderWidth: 3,
                     pointBackgroundColor: 'white',
-                    pointBorderColor: productsData['lua'].color,
+                    pointBorderColor: info.color,
                     pointBorderWidth: 2,
                     pointRadius: 4,
                     fill: true,
@@ -182,14 +193,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     x: { grid: { display: false, drawBorder: false } },
                     y: { 
                         display: true, 
-                        min: productsData['lua'].min,
+                        min: info.min,
                         grid: { color: '#f1f5f9', drawBorder: false },
                         ticks: { font: { size: 11 }, color: '#94a3b8' }
                     }
                 }
             }
         });
-    }
+    };
+
+    // start fetching
+    loadPriceData();
 
     // Product dropddown Bind
     const productSelect = document.getElementById('dash-product');
@@ -200,6 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if(priceChart && info) {
                 // Update specific product data
+                priceChart.data.labels = info.dates || ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
                 priceChart.data.datasets[0].label = info.label;
                 priceChart.data.datasets[0].data = info.data;
                 priceChart.data.datasets[0].borderColor = info.color;
