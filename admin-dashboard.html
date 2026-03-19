@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Sổ tay Nông dân số</title>
+    <!-- Fonts: Inter for professional SaaS look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="dashboard-page">
+    <div class="saas-dashboard">
+        <!-- Sidebar -->
+        <aside class="dash-sidebar">
+            <div class="dash-profile">
+                <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Avatar Admin">
+                <div>
+                    <strong id="user-name-display">Administrator</strong>
+                    <span class="badge" style="background:var(--red-100); color:var(--red-700);" id="user-role-display">Quản trị viên</span>
+                </div>
+            </div>
+            <nav class="dash-nav">
+                <a href="admin-dashboard.html" class="active"><i class="fa-solid fa-gauge-high"></i> Bảng điều khiển</a>
+                <a href="#"><i class="fa-solid fa-users"></i> Quản lý Nông dân</a>
+                <a href="#"><i class="fa-solid fa-seedling"></i> Quản lý Nông sản</a>
+                <a href="#"><i class="fa-solid fa-signs-post"></i> Quản lý Báo cáo</a>
+                <a href="#"><i class="fa-solid fa-gear"></i> Cài đặt hệ thống</a>
+            </nav>
+            <div style="margin-top: auto; padding: 20px 12px;">
+                <a href="index.html" id="logout-btn" style="color: var(--red-500); text-decoration: none; display: flex; align-items: center; gap: 12px; padding: 10px 16px; font-weight: 500;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất</a>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="dash-main">
+            <!-- Topbar -->
+            <header class="dash-topbar">
+                <div class="page-title">
+                    <h3>Tổng quan Hệ thống</h3>
+                    <p>Chào mừng Admin, đây là báo cáo ngày hôm nay</p>
+                </div>
+                <div class="dash-controls">
+                    <button class="btn btn-primary" style="padding: 10px 20px;"><i class="fa-solid fa-plus"></i> Thêm Nông dân</button>
+                    <button class="btn btn-icon"><i class="fa-solid fa-bell"></i><span class="notify-dot"></span></button>
+                </div>
+            </header>
+            
+            <!-- Dashboard Widgets Grid -->
+            <div class="dash-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                <!-- Widget 1 -->
+                <div class="widget">
+                    <div class="widget-head" style="margin-bottom: 10px;">
+                        <h4><i class="fa-solid fa-users text-blue"></i> Tổng số Nông dân</h4>
+                    </div>
+                    <div id="stat-farmers" style="font-size: 2rem; font-weight: 700; color: var(--slate-800);">...</div>
+                    <div style="color: var(--emerald-600); font-size: 0.85rem; margin-top: 5px;"><i class="fa-solid fa-database"></i> Dữ liệu thật từ MySQL</div>
+                </div>
+
+                <!-- Widget 2 -->
+                <div class="widget">
+                    <div class="widget-head" style="margin-bottom: 10px;">
+                        <h4><i class="fa-solid fa-seedling text-emerald"></i> Số liệu Nông sản</h4>
+                    </div>
+                    <div id="stat-products" style="font-size: 2rem; font-weight: 700; color: var(--slate-800);">...</div>
+                    <div style="color: var(--emerald-600); font-size: 0.85rem; margin-top: 5px;"><i class="fa-solid fa-arrow-trend-up"></i> Tăng đều cho cây lúa</div>
+                </div>
+
+                <!-- Widget 3 -->
+                <div class="widget">
+                    <div class="widget-head" style="margin-bottom: 10px;">
+                        <h4><i class="fa-solid fa-truck-fast text-orange"></i> Lệnh thu mua mới</h4>
+                    </div>
+                    <div id="stat-orders" style="font-size: 2rem; font-weight: 700; color: var(--slate-800);">...</div>
+                    <div style="color: var(--red-500); font-size: 0.85rem; margin-top: 5px;"><i class="fa-solid fa-arrow-trend-down"></i> -2% so với hôm qua</div>
+                </div>
+            </div>
+
+            <!-- User table -->
+            <div class="widget" style="margin-top: 24px;">
+                <div class="widget-head">
+                    <h4>Danh sách Nông dân mới đăng ký</h4>
+                    <button class="btn btn-sm btn-outline" style="border-radius: 6px;">Xem tất cả</button>
+                </div>
+                <div style="overflow-x: auto; margin-top: 15px;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid var(--slate-200); color: var(--slate-500);">
+                                <th style="padding: 12px 10px; font-weight: 500;">Email</th>
+                                <th style="padding: 12px 10px; font-weight: 500;">Vai trò</th>
+                                <th style="padding: 12px 10px; font-weight: 500;">Ngày Đăng ký</th>
+                                <th style="padding: 12px 10px; font-weight: 500;">Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody id="farmer-list-table">
+                            <tr><td colspan="4" style="text-align:center; padding: 20px;">Đang tải dữ liệu...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = JSON.parse(localStorage.getItem('user'));
+            const token = localStorage.getItem('token');
+            if (!token || !user || user.role !== 'admin') {
+                alert('Bạn không có quyền truy cập trang này. Vui lòng đăng nhập bằng tài khoản Quản trị viên.');
+                window.location.href = 'login.html';
+                return;
+            } else {
+                if(document.getElementById('user-name-display')) {
+                    document.getElementById('user-name-display').innerText = user.email.split('@')[0];
+                }
+            }
+            
+            // Logout
+            document.getElementById('logout-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = 'index.html';
+            });
+
+            // Fetch Real Data From Admin API
+            try {
+                const response = await fetch('http://localhost:3000/api/admin/dashboard', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Render Stats
+                    document.getElementById('stat-farmers').innerText = data.totalFarmers;
+                    document.getElementById('stat-products').innerText = data.totalProducts;
+                    document.getElementById('stat-orders').innerText = data.totalOrders;
+
+                    // Render Farmers List
+                    const tableBody = document.getElementById('farmer-list-table');
+                    tableBody.innerHTML = '';
+                    
+                    if (data.recentFarmers && data.recentFarmers.length > 0) {
+                        data.recentFarmers.forEach(farmer => {
+                            const date = new Date(farmer.created_at).toLocaleDateString('vi-VN');
+                            tableBody.innerHTML += `
+                                <tr style="border-bottom: 1px solid var(--slate-100);">
+                                    <td style="padding: 12px 10px; font-weight: 500;">${farmer.email}</td>
+                                    <td style="padding: 12px 10px;">Nông dân</td>
+                                    <td style="padding: 12px 10px;">${date}</td>
+                                    <td style="padding: 12px 10px;"><span style="color:var(--emerald-600); background:var(--emerald-50); padding:4px 8px; border-radius:12px; font-size:0.75rem;">Hoạt động</span></td>
+                                </tr>
+                            `;
+                        });
+                    } else {
+                        tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px;">Chưa có tài khoản nông dân nào</td></tr>`;
+                    }
+                } else if (response.status === 401 || response.status === 403) {
+                    alert('Phiên bản đăng nhập hết hạn hoặc bạn không có quyền Admin!');
+                    localStorage.clear();
+                    window.location.href = 'login.html';
+                }
+            } catch (error) {
+                console.error('Lỗi khi tải dữ liệu admin:', error);
+                document.getElementById('farmer-list-table').innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Lỗi kết nối Server! Vui lòng kiểm tra tiến trình node server.js</td></tr>`;
+            }
+        });
+    </script>
+</body>
+</html>

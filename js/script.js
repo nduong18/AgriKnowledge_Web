@@ -283,8 +283,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     email: email
                 }));
                 window.location.href = 'dashboard.html';
-            } else {
-                alert('Email hoặc mật khẩu không chính xác! (Gợi ý: duonghocbai18@gmail.com / 1)');
             }
         });
     }
