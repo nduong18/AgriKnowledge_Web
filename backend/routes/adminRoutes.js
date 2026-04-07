@@ -7,5 +7,7 @@ const { verifyToken, isAdmin } = require('../middleware/authMiddleware');
 router.use(verifyToken, isAdmin);
 
 router.get('/dashboard', adminController.getDashboardStats);
+router.get('/products', adminController.getProducts);
+router.post('/products', adminController.addProduct);
 
 module.exports = router;

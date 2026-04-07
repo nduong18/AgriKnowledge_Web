@@ -103,6 +103,55 @@
                 </div>
             </div>
 
+            <!-- Product/Crawler Management -->
+            <div class="dash-grid" style="grid-template-columns: 1fr 2fr; margin-top: 24px;">
+                <div class="widget">
+                    <div class="widget-head">
+                        <h4>Thêm Crawler Nông sản mới</h4>
+                    </div>
+                    <form id="add-product-form" style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
+                        <div>
+                            <label style="font-size: 0.85rem; font-weight: 500;">Tên Ký hiệu (Ví dụ: tieu)</label>
+                            <input type="text" id="prod-key" class="form-control" required style="padding: 8px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.85rem; font-weight: 500;">Tên Hiển thị (Ví dụ: Giá Tiêu)</label>
+                            <input type="text" id="prod-name" class="form-control" required style="padding: 8px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.85rem; font-weight: 500;">URL Lấy giá (từ nhabeagri.com)</label>
+                            <input type="url" id="prod-url" class="form-control" required style="padding: 8px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.85rem; font-weight: 500;">Mã màu Biểu đồ (Hex)</label>
+                            <input type="color" id="prod-color" class="form-control" value="#ef4444" style="padding: 4px; height: 40px; cursor: pointer;">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="padding: 10px;">Thêm URL mới</button>
+                    </form>
+                </div>
+
+                <div class="widget">
+                    <div class="widget-head">
+                        <h4>Danh sách Web Crawler Nông sản</h4>
+                        <button onclick="loadProducts()" class="btn btn-sm btn-outline-emerald"><i class="fa-solid fa-rotate-right"></i> Làm mới</button>
+                    </div>
+                    <div style="overflow-x: auto; margin-top: 15px; max-height: 400px;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--slate-200); color: var(--slate-500);">
+                                    <th style="padding: 12px 10px; font-weight: 500;">Ký hiệu</th>
+                                    <th style="padding: 12px 10px; font-weight: 500;">Nông sản</th>
+                                    <th style="padding: 12px 10px; font-weight: 500;">Nguồn (URL)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="product-list-table">
+                                <tr><td colspan="3" style="text-align:center; padding: 20px;">Đang tải dữ liệu...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -170,6 +219,62 @@
                 console.error('Lỗi khi tải dữ liệu admin:', error);
                 document.getElementById('farmer-list-table').innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Lỗi kết nối Server! Vui lòng kiểm tra tiến trình node server.js</td></tr>`;
             }
+
+            // Fetch Products
+            window.loadProducts = async () => {
+                try {
+                    const res = await fetch('http://localhost:3000/api/admin/products', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (res.ok) {
+                        const prods = await res.json();
+                        const pBody = document.getElementById('product-list-table');
+                        pBody.innerHTML = '';
+                        prods.forEach(p => {
+                            pBody.innerHTML += `
+                                <tr style="border-bottom: 1px solid var(--slate-100);">
+                                    <td style="padding: 12px 10px;"><strong style="color: ${p.color};">${p.key_name}</strong></td>
+                                    <td style="padding: 12px 10px; font-weight: 500;">${p.name}</td>
+                                    <td style="padding: 12px 10px;"><a href="${p.url}" target="_blank" style="color:var(--emerald-600); font-size: 0.8rem; word-break: break-all;">${p.url || 'Dữ liệu nội bộ'}</a></td>
+                                </tr>
+                            `;
+                        });
+                    }
+                } catch(e) { console.error(e); }
+            };
+            loadProducts();
+
+            // Add Product Submit
+            document.getElementById('add-product-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = e.target.querySelector('button');
+                btn.innerText = 'Đang xử lý...';
+                
+                try {
+                    const payload = {
+                        key_name: document.getElementById('prod-key').value,
+                        name: document.getElementById('prod-name').value,
+                        url: document.getElementById('prod-url').value,
+                        color: document.getElementById('prod-color').value
+                    };
+                    const r = await fetch('http://localhost:3000/api/admin/products', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify(payload)
+                    });
+                    const result = await r.json();
+                    if (r.ok) {
+                        alert(result.message);
+                        e.target.reset();
+                        loadProducts(); // reload table
+                    } else {
+                        alert(result.error);
+                    }
+                } catch(err) {
+                    alert('Lỗi kết nối đến máy chủ');
+                }
+                btn.innerText = 'Thêm URL mới';
+            });
         });
     </script>
 </body>

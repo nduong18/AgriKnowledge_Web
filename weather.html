@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Môi trường & Thời tiết - Sổ tay Nông dân số</title>
+    <!-- Fonts: Inter for professional SaaS look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .weather-content {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 85px);
+            overflow-y: auto; /* Cho phép cuộn trang chính */
+        }
+
+        .weather-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--slate-200);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .weather-desc {
+            color: var(--slate-600);
+            margin-bottom: 24px;
+            font-size: 1rem;
+        }
+
+        .weather-controls {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 16px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        @media (max-width: 1024px) {
+            .weather-controls {
+                grid-template-columns: 1fr 1fr;
+            }
+            .weather-controls select {
+                grid-column: span 2;
+            }
+        }
+
+        .weather-controls select {
+            height: 48px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--slate-300);
+            padding: 0 16px;
+            font-size: 1rem;
+            font-family: inherit;
+            color: var(--slate-800);
+            background: var(--slate-50);
+            transition: var(--transition);
+            outline: none;
+        }
+
+        .weather-controls select:focus {
+            border-color: var(--emerald-500);
+            box-shadow: 0 0 0 3px var(--emerald-100);
+        }
+
+        .weather-controls button, .weather-controls a.link-btn {
+            height: 48px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+            gap: 8px;
+        }
+
+        .btn-prev-next {
+            background: white;
+            border: 1px solid var(--slate-300);
+            color: var(--slate-700);
+        }
+
+        .btn-prev-next:hover {
+            background: var(--slate-50);
+            color: var(--emerald-600);
+            border-color: var(--emerald-500);
+        }
+
+        .current-weather-hero {
+            display: flex;
+            gap: 24px;
+            background: linear-gradient(135deg, var(--emerald-50), var(--emerald-100));
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 32px;
+            border: 1px solid var(--emerald-200);
+        }
+
+        .hero-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hero-left h2 {
+            margin-bottom: 4px;
+            font-size: 1.5rem;
+            color: var(--slate-800);
+        }
+
+        .cw-date {
+            font-size: 0.9rem;
+            color: var(--slate-500);
+            margin-bottom: 16px;
+        }
+
+        .temp-display {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 8px;
+        }
+
+        .temp-display i {
+            font-size: 4rem;
+        }
+
+        .temp-value {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--slate-900);
+            line-height: 1;
+        }
+        
+        .temp-value small {
+            font-size: 1.5rem;
+            position: relative;
+            top: -20px;
+        }
+
+        .hero-right {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 200px;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sb-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .stat-box strong {
+            display: block;
+            font-size: 1rem;
+            color: var(--slate-900);
+        }
+
+        .stat-box small {
+            color: var(--slate-500);
+            font-size: 0.8rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .forecast-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 16px;
+        }
+
+        .forecast-card {
+            background: white;
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .forecast-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--emerald-200);
+        }
+
+        .forecast-card.today {
+            background: var(--emerald-50);
+            border-color: var(--emerald-200);
+        }
+
+        .fc-day {
+            font-weight: 600;
+            color: var(--slate-800);
+            margin-bottom: 2px;
+        }
+
+        .fc-date {
+            font-size: 0.85rem;
+            color: var(--slate-500);
+            margin-bottom: 12px;
+        }
+
+        .fc-icon {
+            font-size: 2.2rem;
+            margin-bottom: 16px;
+        }
+
+        .fc-temps {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            font-weight: 600;
+        }
+
+        .fc-max { color: var(--slate-900); }
+        .fc-min { color: var(--slate-500); }
+
+        @media (max-width: 768px) {
+            .current-weather-hero {
+                flex-direction: column;
+            }
+        }
+
+
+    </style>
+</head>
+<body class="dashboard-page">
+    <div class="saas-dashboard">
+        <!-- Sidebar -->
+        <aside class="dash-sidebar">
+            <div class="dash-profile">
+                <img src="https://images.unsplash.com/photo-1599839619722-39751411ea63?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Avatar">
+                <div>
+                    <strong id="user-name-display">Nguyễn Văn A</strong>
+                    <span class="badge badge-farmer" id="user-role-display">Nông dân</span>
+                </div>
+            </div>
+            <nav class="dash-nav">
+                <a href="dashboard.html"><i class="fa-solid fa-house"></i> Tổng quan</a>
+                <a href="weather.html" class="active"><i class="fa-solid fa-cloud-sun-rain"></i> Thời tiết & Môi trường</a>
+                <a href="#"><i class="fa-solid fa-seedling"></i> Nhật ký canh tác</a>
+                <a href="#"><i class="fa-solid fa-chart-line"></i> Thị trường & Giá</a>
+                <a href="#"><i class="fa-solid fa-handshake"></i> Đơn vị thu mua</a>
+                <a href="#"><i class="fa-solid fa-book"></i> Cẩm nang Kỹ thuật</a>
+            </nav>
+            <div style="margin-top: auto; padding: 20px 12px;">
+                <a href="index.html" id="logout-btn" style="color: var(--red-500); text-decoration: none; display: flex; align-items: center; gap: 12px; padding: 10px 16px; font-weight: 500;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất</a>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="dash-main">
+            <!-- Topbar -->
+            <header class="dash-topbar">
+                <div class="page-title">
+                    <h3>Thời tiết & Môi trường</h3>
+                    <p>Cập nhật dữ liệu khí hậu 63 tỉnh thành trực tiếp</p>
+                </div>
+                <div class="dash-controls">
+                    <button class="btn btn-icon"><i class="fa-solid fa-bell"></i><span class="notify-dot"></span></button>
+                    <a href="dashboard.html" class="btn btn-outline-emerald btn-sm"><i class="fa-solid fa-arrow-left"></i> Về bảng T.Quan</a>
+                </div>
+            </header>
+            
+            <div class="weather-content">
+                <div class="weather-card">
+                    <p class="weather-desc">
+                        Hệ thống cung cấp dữ liệu thời tiết chi tiết theo từng địa phương nhằm hỗ trợ quyết định canh tác. Chọn tỉnh/thành để xem dự báo 7 ngày.
+                    </p>
+
+                    <div class="weather-controls">
+                        <select id="provinceSelect"></select>
+                        <button id="prevBtn" class="btn-prev-next"><i class="fa-solid fa-chevron-left"></i> Tỉnh trước</button>
+                        <button id="nextBtn" class="btn-prev-next">Tỉnh sau <i class="fa-solid fa-chevron-right"></i></button>
+                        <!-- Removed Open Web Page button as it is Native now -->
+                        <div id="native-weather-container">
+                            <!-- Fetched and Rendered by js/weather.js -->
+                        </div>
+
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Custom Script -->
+    <script src="js/script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('user'));
+            const token = localStorage.getItem('token');
+            if (!token || !user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const nameDisplay = document.getElementById('user-name-display');
+            if(nameDisplay && user) {
+                nameDisplay.innerText = user.display_name || (user.email ? user.email.split('@')[0] : 'Người dùng');
+            }
+
+            const logoutBtn = document.getElementById('logout-btn');
+            if(logoutBtn) {
+                logoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    window.location.href = 'login.html';
+                });
+            }
+        });
+    </script>
+    <script src="js/weather.js"></script>
+</body>
+</html>

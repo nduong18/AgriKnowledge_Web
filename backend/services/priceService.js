@@ -2,27 +2,29 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const https = require('https');
 const { parsePrice } = require('../utils/priceParser');
-
-const urls = {
-    "caphe": { name: "Giá Cà Phê Arabica", url: "https://nhabeagri.com/gia-nong-san/gia-ca-phe-arabica/" },
-    "cacao": { name: "Giá Ca Cao", url: "https://nhabeagri.com/gia-nong-san/gia-ca-cao/" },
-    "lua": { name: "Giá Gạo Thô", url: "https://nhabeagri.com/gia-nong-san/gia-gao-tho/" },
-    "ngo": { name: "Giá Ngô Mới Nhất", url: "https://nhabeagri.com/gia-nong-san/gia-ngo-moi-nhat/" },
-    "daunanh": { name: "Giá Hạt Đậu Nành Thô", url: "https://nhabeagri.com/gia-hat-dau-nanh-tho/" },
-};
+const db = require('../config/db');
 
 const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 
 async function scrapePrices() {
     const results = {};
-    const colors = {
-        "lua": { color: "#3b82f6", bg: "rgba(59, 130, 246, 0.1)" },
-        "caphe": { color: "#8b5cf6", bg: "rgba(139, 92, 246, 0.1)" },
-        "cacao": { color: "#a855f7", bg: "rgba(168, 85, 247, 0.1)" },
-        "ngo": { color: "#eab308", bg: "rgba(234, 179, 8, 0.1)" },
-        "daunanh": { color: "#22c55e", bg: "rgba(34, 197, 94, 0.1)" },
-        "saurieng": { color: "#f97316", bg: "rgba(249, 115, 22, 0.1)" }
-    };
+    
+    // Lấy danh sách URL Crawler từ DB thay vì Hardcode
+    let urls = {};
+    try {
+        const [rows] = await db.query('SELECT * FROM products');
+        for (const row of rows) {
+            urls[row.key_name] = { 
+                name: row.name, 
+                url: row.url, 
+                color: row.color, 
+                bg: row.bg_color 
+            };
+        }
+    } catch(err) {
+        console.error("Lỗi lấy danh sách nông sản từ CSDL:", err);
+        return {};
+    }
 
     for (const [key, info] of Object.entries(urls)) {
         // Init default empty
@@ -30,8 +32,8 @@ async function scrapePrices() {
             label: info.name,
             dates: ["T2", "T3", "T4", "T5", "T6", "T7", "CN"],
             data: [0, 0, 0, 0, 0, 0, 0],
-            color: colors[key].color,
-            bg: colors[key].bg,
+            color: info.color || '#3b82f6',
+            bg: info.bg || 'rgba(59, 130, 246, 0.1)',
             min: 0,
             originalData: []
         };

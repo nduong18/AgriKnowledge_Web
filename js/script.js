@@ -145,6 +145,16 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const res = await fetch('http://localhost:3000/api/prices');
             productsData = await res.json();
+            
+            // Build dynamic dropdown options based on backend response
+            const productSelect = document.getElementById('dash-product');
+            if (productSelect) {
+                productSelect.innerHTML = '';
+                for (const [key, info] of Object.entries(productsData)) {
+                    productSelect.innerHTML += `<option value="${key}">${info.label}</option>`;
+                }
+            }
+            
             initChart();
         } catch (error) {
             console.error('Lỗi API giá:', error);

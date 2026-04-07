@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const priceRoutes = require('./routes/priceRoutes');
@@ -8,6 +9,9 @@ const priceRoutes = require('./routes/priceRoutes');
 const app = express();
 app.use(cors());
 app.use(express.json()); // Để parse body dạng JSON
+
+// Phục vụ frontend (các file tĩnh HTML, CSS, JS) từ thư mục gốc
+app.use(express.static(path.join(__dirname, '../')));
 
 // Sử dụng Routes cho RESTful API
 app.use('/api/prices', priceRoutes);
