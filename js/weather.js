@@ -75,10 +75,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Populate Datalist and Select
     provincesData.forEach((p, index) => {
-        // For search datalist
-        const dlOption = document.createElement("option");
-        dlOption.value = p.name;
-        datalist.appendChild(dlOption);
+        // For search datalist (now left empty at startup)
+        // Options will be injected on typing
 
         // For dropdown select
         if (select) {
@@ -244,9 +242,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Provide dynamic typing suggestions for datalist
+    input.addEventListener("input", () => {
+        const val = input.value.trim().toLowerCase();
+        datalist.innerHTML = "";
+        if (val.length >= 1) {
+            provincesData.forEach(p => {
+                if (p.name.toLowerCase().includes(val)) {
+                    const option = document.createElement("option");
+                    option.value = p.name;
+                    datalist.appendChild(option);
+                }
+            });
+        }
+    });
+
     // Clear input on focus for easy typing
     input.addEventListener("focus", () => {
         input.value = "";
+        datalist.innerHTML = "";
     });
     
     // Restore value if blur and empty

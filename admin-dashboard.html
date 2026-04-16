@@ -17,22 +17,25 @@
     <div class="saas-dashboard">
         <!-- Sidebar -->
         <aside class="dash-sidebar">
-            <div class="dash-profile">
-                <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Avatar Admin">
-                <div>
-                    <strong id="user-name-display">Administrator</strong>
-                    <span class="badge" style="background:var(--red-100); color:var(--red-700);" id="user-role-display">Quản trị viên</span>
+            <button id="sidebarToggleBtn" class="floating-toggle-btn"><i class="fa-solid fa-angle-left" id="toggleIcon"></i></button>
+            <div class="sidebar-content-wrapper">
+                <div class="dash-profile">
+                    <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Avatar Admin">
+                    <div class="dash-profile-info">
+                        <strong id="user-name-display">Administrator</strong>
+                        <span class="badge" style="background:var(--red-100); color:var(--red-700);" id="user-role-display">Quản trị viên</span>
+                    </div>
                 </div>
-            </div>
-            <nav class="dash-nav">
-                <a href="admin-dashboard.html" class="active"><i class="fa-solid fa-gauge-high"></i> Bảng điều khiển</a>
-                <a href="#"><i class="fa-solid fa-users"></i> Quản lý Nông dân</a>
-                <a href="#"><i class="fa-solid fa-seedling"></i> Quản lý Nông sản</a>
-                <a href="#"><i class="fa-solid fa-signs-post"></i> Quản lý Báo cáo</a>
-                <a href="#"><i class="fa-solid fa-gear"></i> Cài đặt hệ thống</a>
-            </nav>
-            <div style="margin-top: auto; padding: 20px 12px;">
-                <a href="index.html" id="logout-btn" style="color: var(--red-500); text-decoration: none; display: flex; align-items: center; gap: 12px; padding: 10px 16px; font-weight: 500;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất</a>
+                <nav class="dash-nav">
+                    <a href="admin-dashboard.html" class="active"><i class="fa-solid fa-gauge-high"></i> <span>Bảng điều khiển</span></a>
+                    <a href="#"><i class="fa-solid fa-users"></i> <span>Quản lý Nông dân</span></a>
+                    <a href="#"><i class="fa-solid fa-seedling"></i> <span>Quản lý Nông sản</span></a>
+                    <a href="#"><i class="fa-solid fa-signs-post"></i> <span>Quản lý Báo cáo</span></a>
+                    <a href="#"><i class="fa-solid fa-gear"></i> <span>Cài đặt hệ thống</span></a>
+                </nav>
+                <div style="margin-top: auto; padding: 20px 12px;">
+                    <a href="index.html" id="logout-btn" style="color: var(--red-500); text-decoration: none; display: flex; align-items: center; gap: 12px; padding: 10px 16px; font-weight: 500;"><i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="logout-text">Đăng xuất</span></a>
+                </div>
             </div>
         </aside>
         
@@ -275,6 +278,19 @@
                 }
                 btn.innerText = 'Thêm URL mới';
             });
+
+            // Sidebar Toggle Logic
+            const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+            const sidebar = document.querySelector('.dash-sidebar');
+            if (sidebarToggleBtn && sidebar) {
+                if (localStorage.getItem('sidebarState') === 'collapsed') {
+                    sidebar.classList.add('collapsed');
+                }
+                sidebarToggleBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('collapsed');
+                    localStorage.setItem('sidebarState', sidebar.classList.contains('collapsed') ? 'collapsed' : 'expanded');
+                });
+            }
         });
     </script>
 </body>

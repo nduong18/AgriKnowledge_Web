@@ -360,23 +360,27 @@
     <div class="saas-dashboard">
         <!-- Sidebar -->
         <aside class="dash-sidebar">
-            <div class="dash-profile">
+            <button id="sidebarToggleBtn" class="floating-toggle-btn"><i class="fa-solid fa-angle-left" id="toggleIcon"></i></button>
+            
+            <div class="sidebar-content-wrapper">
+                <div class="dash-profile">
                 <img src="https://images.unsplash.com/photo-1599839619722-39751411ea63?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Avatar">
-                <div>
+                <div class="dash-profile-info">
                     <strong id="user-name-display">Nguyễn Văn A</strong>
                     <span class="badge badge-farmer" id="user-role-display">Nông dân</span>
                 </div>
             </div>
             <nav class="dash-nav">
-                <a href="dashboard.html"><i class="fa-solid fa-house"></i> Tổng quan</a>
-                <a href="weather.html" class="active"><i class="fa-solid fa-cloud-sun-rain"></i> Thời tiết & Môi trường</a>
-                <a href="#"><i class="fa-solid fa-seedling"></i> Nhật ký canh tác</a>
-                <a href="#"><i class="fa-solid fa-chart-line"></i> Thị trường & Giá</a>
-                <a href="#"><i class="fa-solid fa-handshake"></i> Đơn vị thu mua</a>
-                <a href="#"><i class="fa-solid fa-book"></i> Cẩm nang Kỹ thuật</a>
+                <a href="dashboard.html"><i class="fa-solid fa-house"></i> <span>Tổng quan</span></a>
+                <a href="weather.html" class="active"><i class="fa-solid fa-cloud-sun-rain"></i> <span>Thời tiết & Môi trường</span></a>
+                <a href="#"><i class="fa-solid fa-seedling"></i> <span>Nhật ký canh tác</span></a>
+                <a href="#"><i class="fa-solid fa-chart-line"></i> <span>Thị trường & Giá</span></a>
+                <a href="#"><i class="fa-solid fa-handshake"></i> <span>Đơn vị thu mua</span></a>
+                <a href="#"><i class="fa-solid fa-book"></i> <span>Cẩm nang Kỹ thuật</span></a>
             </nav>
-            <div style="margin-top: auto; padding: 20px 12px;">
-                <a href="index.html" id="logout-btn" style="color: var(--red-500); text-decoration: none; display: flex; align-items: center; gap: 12px; padding: 10px 16px; font-weight: 500;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất</a>
+                <div style="margin-top: auto; padding: 20px 12px;">
+                    <a href="index.html" id="logout-btn" style="color: var(--red-500); text-decoration: none; display: flex; align-items: center; gap: 12px; padding: 10px 16px; font-weight: 500;"><i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="logout-text">Đăng xuất</span></a>
+                </div>
             </div>
         </aside>
         
@@ -438,6 +442,19 @@
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');
                     window.location.href = 'login.html';
+                });
+            }
+
+            // Sidebar Toggle Logic
+            const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+            const sidebar = document.querySelector('.dash-sidebar');
+            if (sidebarToggleBtn && sidebar) {
+                if (localStorage.getItem('sidebarState') === 'collapsed') {
+                    sidebar.classList.add('collapsed');
+                }
+                sidebarToggleBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('collapsed');
+                    localStorage.setItem('sidebarState', sidebar.classList.contains('collapsed') ? 'collapsed' : 'expanded');
                 });
             }
         });
