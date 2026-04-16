@@ -29,7 +29,6 @@
             <ul class="nav-menu">
                 <li><a href="#features">Tính năng cốt lõi</a></li>
                 <li><a href="#dashboard-preview">Trải nghiệm Nền tảng</a></li>
-                <li><a href="#knowledge-graph">Đồ thị Tri thức AI</a></li>
             </ul>
             <div class="nav-actions">
                 <a href="login.html" class="btn btn-ghost">Đăng nhập</a>
@@ -62,11 +61,6 @@
                     <div class="stat-item">
                         <strong>Live API</strong>
                         <span>Thời tiết & Giá cả</span>
-                    </div>
-                    <div class="stat-divider"></div>
-                    <div class="stat-item">
-                        <strong>Neo4j Graph</strong>
-                        <span>AI Khuyến nghị</span>
                     </div>
                     <div class="stat-divider"></div>
                     <div class="stat-item">
@@ -274,59 +268,6 @@
                         </div>
                     </div>
                 </main>
-            </div>
-        </div>
-    </section>
-
-    <!-- Knowledge Graph Technical Explanation Section -->
-    <section id="knowledge-graph" class="section bg-slate border-top">
-        <div class="container">
-            <div class="split-layout">
-                <div class="split-content text-left">
-                    <span class="badge badge-purple mb-15">LÕI CÔNG NGHỆ NE04J</span>
-                    <h2 class="title" style="margin-bottom: 20px;">Xử Lý Ngôn Ngữ & Đồ Thị Tri Thức</h2>
-                    <p class="desc">
-                        Hệ thống không lưu trữ kinh nghiệm nông nghiệp dưới dạng văn bản chết. "Sổ tay Nông dân số" áp dụng <strong>Knowledge Graph</strong> để định hình các mảng khái niệm (Ontology), móc nối logic giữa: 
-                        <span class="text-emerald font-semibold">Cây trồng</span> ↔ 
-                        <span class="text-emerald font-semibold">Sâu bệnh</span> ↔ 
-                        <span class="text-emerald font-semibold">Đặc điểm thổ nhưỡng</span> ↔
-                        <span class="text-emerald font-semibold">Giải pháp đặc trị</span>.
-                    </p>
-                    <ul class="tech-list mt-30">
-                        <li><i class="fa-solid fa-circle-check text-purple"></i> Chuẩn đoán chính xác: Nhập dấu hiệu bệnh, AI truy vết biểu đồ, ra kết luận chỉ trong vài mili-giây.</li>
-                        <li><i class="fa-solid fa-circle-check text-purple"></i> Bản địa hóa: Phân loại giải pháp dựa trên vị trí địa lý của bạn (đại lý thuốc nào gần nhất có bán).</li>
-                        <li><i class="fa-solid fa-circle-check text-purple"></i> CSDL Graph (Neo4j) thay thế RDBMS truyền thống giúp truy vấn mạng lưới đa chiều.</li>
-                    </ul>
-                </div>
-                
-                <!-- KG Visualization Interactive Widget -->
-                <div class="split-visual kg-interactive-box">
-                    <div class="kg-query-box">
-                        <i class="fa-solid fa-terminal"></i> <span>QUERY: MATCH (c:Cây_Trồng)-[:MẮC_BỆNH]->(b:Bệnh)-[:GIẢI_PHÁP]->(g:Thuốc) RETURN c,b,g</span>
-                    </div>
-                    <div class="kg-graph-canvas" id="graph-container">
-                        <div class="node node-primary" style="top:50%; left:20%;">Lúa IR50404</div>
-                        <div class="node node-danger pulse-anim" style="top:20%; left:50%;">Bệnh Vàng Lá</div>
-                        <div class="node node-danger pulse-anim" style="top:80%; left:50%;">Rầy Nâu</div>
-                        <div class="node node-success" style="top:20%; left:85%;">Thuốc Đặc Trị A</div>
-                        <div class="node node-success" style="top:80%; left:85%;">Thuốc Phun B</div>
-                        
-                        <!-- SVG Lines for Connections -->
-                        <svg class="kg-edges">
-                            <line x1="20%" y1="50%" x2="50%" y2="20%" class="edge anim-edge"/>
-                            <text x="35%" y="30%" class="edge-text">MẮC_BỆNH</text>
-                            
-                            <line x1="20%" y1="50%" x2="50%" y2="80%" class="edge anim-edge"/>
-                            <text x="35%" y="70%" class="edge-text">DỄ_BỊ</text>
-                            
-                            <line x1="50%" y1="20%" x2="85%" y2="20%" class="edge-solid"/>
-                            <text x="67%" y="15%" class="edge-text text-success">GIẢI_PHÁP_TỐI_ƯU</text>
-                            
-                            <line x1="50%" y1="80%" x2="85%" y2="80%" class="edge-solid"/>
-                            <text x="67%" y="75%" class="edge-text text-success">CÁCH_PHÒNG</text>
-                        </svg>
-                    </div>
-                </div>
             </div>
         </div>
     </section>

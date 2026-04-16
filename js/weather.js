@@ -65,27 +65,39 @@ const provincesData = [
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById("provinceSearch");
     const select = document.getElementById("provinceSelect");
+    const datalist = document.getElementById("provinceList");
     const prevBtn = document.getElementById("prevBtn");
     const nextBtn = document.getElementById("nextBtn");
 
-    // Populate Dropdown
+    let currentIndex = 0;
+
+    // Populate Datalist and Select
     provincesData.forEach((p, index) => {
-        const option = document.createElement("option");
-        option.value = index;
-        option.textContent = p.name;
-        select.appendChild(option);
+        // For search datalist
+        const dlOption = document.createElement("option");
+        dlOption.value = p.name;
+        datalist.appendChild(dlOption);
+
+        // For dropdown select
+        if (select) {
+            const selOption = document.createElement("option");
+            selOption.value = index;
+            selOption.textContent = p.name;
+            select.appendChild(selOption);
+        }
     });
 
     const getWeatherIcon = (code) => {
-        if (code === 0) return { icon: "fa-sun", color: "var(--orange-500)", text: "Trời Nắng Khô ráo" };
-        if (code >= 1 && code <= 3) return { icon: "fa-cloud-sun", color: "var(--slate-400)", text: "Nhiều Mây" };
-        if (code >= 45 && code <= 48) return { icon: "fa-smog", color: "var(--slate-400)", text: "Sương Mù" };
-        if (code >= 51 && code <= 67) return { icon: "fa-cloud-rain", color: "var(--blue-500)", text: "Mưa Nhỏ" };
-        if (code >= 71 && code <= 77) return { icon: "fa-snowflake", color: "var(--blue-300)", text: "Lạnh Giá" };
-        if (code >= 80 && code <= 82) return { icon: "fa-cloud-showers-heavy", color: "var(--blue-600)", text: "Mưa Rào" };
-        if (code >= 95) return { icon: "fa-cloud-bolt", color: "var(--purple-500)", text: "Có Giông Bão" };
-        return { icon: "fa-cloud", color: "var(--slate-400)", text: "Có Mây" };
+        if (code === 0) return { icon: "fa-sun", color: "#fbbf24", text: "Trời Nắng Khô ráo" };
+        if (code >= 1 && code <= 3) return { icon: "fa-cloud-sun", color: "#94a3b8", text: "Nhiều Mây" };
+        if (code >= 45 && code <= 48) return { icon: "fa-smog", color: "#94a3b8", text: "Sương Mù" };
+        if (code >= 51 && code <= 67) return { icon: "fa-cloud-rain", color: "#60a5fa", text: "Mưa Nhỏ" };
+        if (code >= 71 && code <= 77) return { icon: "fa-snowflake", color: "#93c5fd", text: "Lạnh Giá" };
+        if (code >= 80 && code <= 82) return { icon: "fa-cloud-showers-heavy", color: "#3b82f6", text: "Mưa Rào" };
+        if (code >= 95) return { icon: "fa-cloud-bolt", color: "#c084fc", text: "Có Giông Bão" };
+        return { icon: "fa-cloud", color: "#94a3b8", text: "Có Mây" };
     };
 
     const formatDate = (dateStr) => {
@@ -102,8 +114,11 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const fetchWeatherData = async (index) => {
+        if (index < 0 || index >= provincesData.length) return;
+        currentIndex = index;
         const province = provincesData[index];
-        select.value = index;
+        input.value = province.name;
+        if (select) select.value = index;
         
         // Cập nhật Hash
         const newHash = "#" + province.slug;
@@ -212,13 +227,38 @@ document.addEventListener('DOMContentLoaded', () => {
         return idx >= 0 ? idx : 0;
     }
 
-    select.addEventListener("change", () => {
-        fetchWeatherData(Number(select.value));
+    if (select) {
+        select.addEventListener("change", () => {
+            fetchWeatherData(Number(select.value));
+        });
+    }
+
+    input.addEventListener("change", () => {
+        const val = input.value.trim();
+        const idx = provincesData.findIndex(p => p.name.toLowerCase() === val.toLowerCase());
+        if (idx !== -1) {
+            fetchWeatherData(idx);
+        } else {
+            // Restore previous valid value if invalid input
+            input.value = provincesData[currentIndex].name;
+        }
+    });
+
+    // Clear input on focus for easy typing
+    input.addEventListener("focus", () => {
+        input.value = "";
+    });
+    
+    // Restore value if blur and empty
+    input.addEventListener("blur", () => {
+        if (!input.value.trim() && provincesData[currentIndex]) {
+            input.value = provincesData[currentIndex].name;
+        }
     });
 
     if(prevBtn) {
         prevBtn.addEventListener("click", () => {
-            let i = Number(select.value) - 1;
+            let i = currentIndex - 1;
             if (i < 0) i = provincesData.length - 1;
             fetchWeatherData(i);
         });
@@ -226,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if(nextBtn) {
         nextBtn.addEventListener("click", () => {
-            let i = Number(select.value) + 1;
+            let i = currentIndex + 1;
             if (i >= provincesData.length) i = 0;
             fetchWeatherData(i);
         });
