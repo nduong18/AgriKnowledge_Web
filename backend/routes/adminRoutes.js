@@ -10,4 +10,10 @@ router.get('/dashboard', adminController.getDashboardStats);
 router.get('/products', adminController.getProducts);
 router.post('/products', adminController.addProduct);
 
+// Farmers Management
+router.get('/farmers', adminController.getAllFarmers);
+router.post('/farmers', adminController.addFarmer);
+router.put('/farmers/:id', adminController.updateFarmer);
+router.delete('/farmers/:id', adminController.deleteFarmer);
+
 module.exports = router;

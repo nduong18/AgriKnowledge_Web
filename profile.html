@@ -159,6 +159,48 @@
             document.getElementById('display_name').value = user.display_name || '';
             document.getElementById('avatar_url').value = user.avatar || '';
             document.getElementById('profile-display-name').textContent = user.display_name || user.email;
+
+            // Handle Role Display
+            const roleDisplays = [document.getElementById('user-role-display'), document.getElementById('profile-role')];
+            roleDisplays.forEach(el => {
+                if(el) {
+                    if (user.role === 'admin') {
+                        el.textContent = 'Quản trị viên';
+                        el.className = 'badge';
+                        el.style.background = 'var(--red-100)';
+                        el.style.color = 'var(--red-700)';
+                    } else {
+                        el.textContent = 'Nông dân';
+                        el.className = 'badge badge-farmer';
+                        el.removeAttribute('style');
+                    }
+                }
+            });
+
+            // Handle Sidebar Navigation Dynamically
+            const sidebarNav = document.querySelector('.dash-nav');
+            if (sidebarNav) {
+                if (user.role === 'admin') {
+                    sidebarNav.innerHTML = `
+                        <a href="admin-dashboard.html"><i class="fa-solid fa-gauge-high"></i> <span>Bảng điều khiển</span></a>
+                        <a href="#"><i class="fa-solid fa-users"></i> <span>Quản lý Nông dân</span></a>
+                        <a href="#"><i class="fa-solid fa-seedling"></i> <span>Quản lý Nông sản</span></a>
+                        <a href="#"><i class="fa-solid fa-signs-post"></i> <span>Quản lý Báo cáo</span></a>
+                        <a href="#"><i class="fa-solid fa-gear"></i> <span>Cài đặt hệ thống</span></a>
+                        <a href="profile.html" class="active"><i class="fa-solid fa-user"></i> <span>Hồ sơ cá nhân</span></a>
+                    `;
+                } else {
+                    sidebarNav.innerHTML = `
+                        <a href="dashboard.html"><i class="fa-solid fa-house"></i> <span>Tổng quan</span></a>
+                        <a href="weather.html"><i class="fa-solid fa-cloud-sun-rain"></i> <span>Thời tiết & Môi trường</span></a>
+                        <a href="#"><i class="fa-solid fa-seedling"></i> <span>Nhật ký canh tác</span></a>
+                        <a href="#"><i class="fa-solid fa-chart-line"></i> <span>Thị trường & Giá</span></a>
+                        <a href="#"><i class="fa-solid fa-handshake"></i> <span>Đơn vị thu mua</span></a>
+                        <a href="#"><i class="fa-solid fa-book"></i> <span>Cẩm nang Kỹ thuật</span></a>
+                        <a href="profile.html" class="active"><i class="fa-solid fa-user"></i> <span>Hồ sơ cá nhân</span></a>
+                    `;
+                }
+            }
             
             const renderAvatar = () => {
                 const avatarSrc = user.avatar ? user.avatar : defaultAvatar;

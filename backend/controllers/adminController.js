@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const bcrypt = require('bcrypt');
 
 exports.getDashboardStats = async (req, res) => {
     try {
@@ -52,5 +53,78 @@ exports.addProduct = async (req, res) => {
     } catch(err) {
         console.error(err);
         res.status(500).json({ error: 'Trùng mã nông sản (Ký hiệu) hoặc máy chủ gặp lỗi!' });
+    }
+}
+
+// Farmers Management
+exports.getAllFarmers = async (req, res) => {
+    try {
+        const [rows] = await db.query("SELECT id, email, display_name, role, avatar, created_at FROM users WHERE role = 'farmer' ORDER BY created_at DESC");
+        res.json(rows);
+    } catch(err) {
+        console.error(err);
+        res.status(500).json({ error: 'Lỗi máy chủ khi lấy danh sách nông dân' });
+    }
+}
+
+exports.addFarmer = async (req, res) => {
+    try {
+        const { email, password, display_name } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Email và mật khẩu không được để trống' });
+        }
+        const [existing] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+        if (existing.length > 0) return res.status(400).json({ error: 'Email này đã tồn tại trong hệ thống' });
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const validName = display_name || 'Nông dân mới';
+        
+        await db.query('INSERT INTO users (email, password, display_name, role) VALUES (?, ?, ?, ?)', [email, hashedPassword, validName, 'farmer']);
+        res.status(201).json({ message: 'Thêm nông dân thành công!' });
+    } catch(err) {
+        console.error(err);
+        res.status(500).json({ error: 'Lỗi máy chủ khi tạo nông dân' });
+    }
+}
+
+exports.updateFarmer = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { display_name, password } = req.body;
+
+        const [users] = await db.query("SELECT * FROM users WHERE id = ? AND role = 'farmer'", [id]);
+        if (users.length === 0) return res.status(404).json({ error: 'Không tìm thấy tài khoản nông dân' });
+
+        let sql = 'UPDATE users SET display_name = ?';
+        let params = [display_name || users[0].display_name];
+
+        if (password && password.trim() !== '') {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            sql += ', password = ?';
+            params.push(hashedPassword);
+        }
+
+        sql += ' WHERE id = ?';
+        params.push(id);
+
+        await db.query(sql, params);
+        res.json({ message: 'Cập nhật thông tin thành công!' });
+    } catch(err) {
+        console.error(err);
+        res.status(500).json({ error: 'Lỗi máy chủ khi cập nhật nông dân' });
+    }
+}
+
+exports.deleteFarmer = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const [users] = await db.query("SELECT * FROM users WHERE id = ? AND role = 'farmer'", [id]);
+        if (users.length === 0) return res.status(404).json({ error: 'Không tìm thấy tài khoản nông dân' });
+
+        await db.query("DELETE FROM users WHERE id = ?", [id]);
+        res.json({ message: 'Xóa tài khoản nông dân thành công!' });
+    } catch(err) {
+        console.error(err);
+        res.status(500).json({ error: 'Lỗi máy chủ khi xóa nông dân' });
     }
 }
