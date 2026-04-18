@@ -56,6 +56,47 @@ exports.addProduct = async (req, res) => {
     }
 }
 
+exports.updateProduct = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { key_name, name, url, color, bg_color } = req.body;
+        
+        const [products] = await db.query('SELECT * FROM products WHERE id = ?', [id]);
+        if (products.length === 0) return res.status(404).json({ error: 'Không tìm thấy nông sản này' });
+        
+        const currentProduct = products[0];
+        
+        const updateKey = key_name !== undefined ? key_name.toLowerCase() : currentProduct.key_name;
+        const updateName = name !== undefined ? name : currentProduct.name;
+        const updateUrl = url !== undefined ? url : currentProduct.url;
+        const updateColor = color !== undefined ? color : currentProduct.color;
+        const updateBgColor = bg_color !== undefined ? bg_color : currentProduct.bg_color;
+
+        await db.query(
+            'UPDATE products SET key_name = ?, name = ?, url = ?, color = ?, bg_color = ? WHERE id = ?',
+            [updateKey, updateName, updateUrl, updateColor, updateBgColor, id]
+        );
+        res.json({ message: 'Cập nhật thông tin nông sản thành công!' });
+    } catch(err) {
+        console.error(err);
+        res.status(500).json({ error: 'Lỗi khi cập nhật nông sản (Có thể trùng ký hiệu)' });
+    }
+}
+
+exports.deleteProduct = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const [products] = await db.query('SELECT * FROM products WHERE id = ?', [id]);
+        if (products.length === 0) return res.status(404).json({ error: 'Không tìm thấy nông sản' });
+
+        await db.query('DELETE FROM products WHERE id = ?', [id]);
+        res.json({ message: 'Xóa nông sản thành công!' });
+    } catch(err) {
+        console.error(err);
+        res.status(500).json({ error: 'Lỗi máy chủ khi xóa nông sản' });
+    }
+}
+
 // Farmers Management
 exports.getAllFarmers = async (req, res) => {
     try {

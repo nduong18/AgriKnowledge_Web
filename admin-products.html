@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Nông dân - Sổ tay Nông dân số</title>
+    <title>Quản lý Nông sản - Sổ tay Nông dân số</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -61,8 +61,8 @@
                 </div>
                 <nav class="dash-nav">
                     <a href="admin-dashboard.html"><i class="fa-solid fa-gauge-high"></i> <span>Bảng điều khiển</span></a>
-                    <a href="admin-farmers.html" class="active"><i class="fa-solid fa-users"></i> <span>Quản lý Nông dân</span></a>
-                    <a href="admin-products.html"><i class="fa-solid fa-seedling"></i> <span>Quản lý Nông sản</span></a>
+                    <a href="admin-farmers.html"><i class="fa-solid fa-users"></i> <span>Quản lý Nông dân</span></a>
+                    <a href="admin-products.html" class="active"><i class="fa-solid fa-seedling"></i> <span>Quản lý Nông sản</span></a>
                     <a href="#"><i class="fa-solid fa-signs-post"></i> <span>Quản lý Báo cáo</span></a>
                     <a href="#"><i class="fa-solid fa-gear"></i> <span>Cài đặt hệ thống</span></a>
                     <a href="profile.html"><i class="fa-solid fa-user"></i> <span>Hồ sơ cá nhân</span></a>
@@ -78,8 +78,8 @@
             <!-- Topbar -->
             <header class="dash-topbar">
                 <div class="page-title">
-                    <h3>Quản lý Nông dân</h3>
-                    <p>Theo dõi và quản lý thông tin các tài khoản Nông dân</p>
+                    <h3>Quản lý Nông sản</h3>
+                    <p>Cấu hình các loại Nông sản lấy giá từ hệ thống (Crawler)</p>
                 </div>
                 <div class="dash-controls">
                     <button class="btn btn-primary" onclick="openModal('add')" style="padding: 10px 20px;"><i class="fa-solid fa-plus"></i> Thêm Mới</button>
@@ -87,25 +87,27 @@
                 </div>
             </header>
             
-            <!-- User table -->
+            <!-- Products table -->
             <div class="widget" style="margin-top: 24px;">
                 <div class="widget-head" style="margin-bottom: 15px;">
-                    <h4>Danh sách Nông dân trong Hệ thống</h4>
-                    <button class="btn btn-sm btn-outline-emerald" onclick="loadFarmers()"><i class="fa-solid fa-rotate-right"></i> Làm mới</button>
+                    <h4>Danh sách Nông sản đang theo dõi</h4>
+                    <button class="btn btn-sm btn-outline-emerald" onclick="loadProducts()"><i class="fa-solid fa-rotate-right"></i> Làm mới</button>
                 </div>
                 <div style="overflow-x: auto;">
                     <table style="width: 100%; border-collapse: collapse; text-align: left;">
                         <thead>
                             <tr style="border-bottom: 1px solid var(--slate-200); color: var(--slate-500); background: var(--slate-50);">
                                 <th style="padding: 12px 10px; font-weight: 600;">ID</th>
-                                <th style="padding: 12px 10px; font-weight: 600;">Họ và Tên</th>
-                                <th style="padding: 12px 10px; font-weight: 600;">Email</th>
-                                <th style="padding: 12px 10px; font-weight: 600;">Ngày Đăng ký</th>
+                                <th style="padding: 12px 10px; font-weight: 600;">Ký hiệu</th>
+                                <th style="padding: 12px 10px; font-weight: 600;">Tên Nông sản</th>
+                                <th style="padding: 12px 10px; font-weight: 600;">Màu sắc</th>
+                                <th style="padding: 12px 10px; font-weight: 600;">Màu nền</th>
+                                <th style="padding: 12px 10px; font-weight: 600;">URL Cắm mốc</th>
                                 <th style="padding: 12px 10px; font-weight: 600; text-align: center;">Thao tác</th>
                             </tr>
                         </thead>
-                        <tbody id="farmer-list-table">
-                            <tr><td colspan="5" style="text-align:center; padding: 20px;">Đang tải dữ liệu...</td></tr>
+                        <tbody id="product-list-table">
+                            <tr><td colspan="7" style="text-align:center; padding: 20px;">Đang tải dữ liệu...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -114,26 +116,35 @@
     </div>
 
     <!-- Modal Form -->
-    <div class="modal" id="farmerModal">
+    <div class="modal" id="productModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="modalTitle">Thêm Nông dân Mới</h3>
+                <h3 id="modalTitle">Thêm Nông sản Mới</h3>
                 <button class="close-btn" onclick="closeModal()">&times;</button>
             </div>
-            <form id="farmerForm">
-                <input type="hidden" id="farmerId">
+            <form id="productForm">
+                <input type="hidden" id="productId">
                 <div class="form-group">
-                    <label for="display_name">Họ và Tên</label>
-                    <input type="text" id="display_name" class="form-control" placeholder="Nhập tên hiển thị" required style="padding: 10px;">
-                </div>
-                <div class="form-group" id="emailGroup">
-                    <label for="email">Tài khoản (Email)</label>
-                    <input type="email" id="email" class="form-control" placeholder="example@agri.com" required style="padding: 10px;">
+                    <label for="key_name">Tên Ký hiệu (ví dụ: tieu)</label>
+                    <input type="text" id="key_name" class="form-control" placeholder="Mã ngắn gọn, không dấu" required style="padding: 10px;">
                 </div>
                 <div class="form-group">
-                    <label for="password" id="passwordLabel">Mật khẩu</label>
-                    <input type="password" id="password" class="form-control" placeholder="Nhập mật khẩu" required style="padding: 10px;">
-                    <small id="passwordHelp" style="display:none; color: var(--slate-500); margin-top:4px;">Bỏ trống nếu không muốn đổi mật khẩu</small>
+                    <label for="name">Tên Hiển thị</label>
+                    <input type="text" id="name" class="form-control" placeholder="Giá Tiêu" required style="padding: 10px;">
+                </div>
+                <div class="form-group">
+                    <label for="url">URL Lấy giá (nếu có)</label>
+                    <input type="url" id="url" class="form-control" placeholder="https://..." style="padding: 10px;">
+                </div>
+                <div style="display: flex; gap: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="color">Màu biểu đồ (Border)</label>
+                        <input type="color" id="color" class="form-control" value="#3b82f6" style="padding: 4px; height: 40px; cursor: pointer;">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="bg_color">Màu nền (Background)</label>
+                        <input type="text" id="bg_color" class="form-control" placeholder="rgba hoặc hex" value="rgba(59, 130, 246, 0.1)" style="padding: 10px;">
+                    </div>
                 </div>
                 <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px;">
                     <button type="button" class="btn btn-outline" style="padding: 10px 20px;" onclick="closeModal()">Hủy</button>
@@ -159,7 +170,7 @@
                 if(nameDisplay) nameDisplay.innerText = user.display_name || (user.email ? user.email.split('@')[0] : 'Administrator');
                 if(sidebarAvatar && user.avatar) sidebarAvatar.src = user.avatar;
                 
-                loadFarmers();
+                loadProducts();
             }
             
             document.getElementById('logout-btn').addEventListener('click', (e) => {
@@ -170,9 +181,9 @@
             });
 
             // Handle Form Submissions
-            document.getElementById('farmerForm').addEventListener('submit', async (e) => {
+            document.getElementById('productForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                window.saveFarmer();
+                window.saveProduct();
             });
 
             // Sidebar Toggle
@@ -189,33 +200,40 @@
             }
         });
 
-        async function loadFarmers() {
-            const tbody = document.getElementById('farmer-list-table');
+        async function loadProducts() {
+            const tbody = document.getElementById('product-list-table');
             try {
-                const response = await fetch('http://localhost:3000/api/admin/farmers', {
+                const response = await fetch('http://localhost:3000/api/admin/products', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (response.ok) {
                     const data = await response.json();
                     tbody.innerHTML = '';
                     if(data.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 20px;">Hệ thống chưa có Nông dân nào.</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px;">Hệ thống chưa có Nông sản nào.</td></tr>`;
                         return;
                     }
                     data.forEach(item => {
-                        const date = new Date(item.created_at).toLocaleDateString('vi-VN');
                         tbody.innerHTML += `
                             <tr style="border-bottom: 1px solid var(--slate-100); transition: background 0.2s; cursor: default;" onmouseover="this.style.background='var(--slate-50)'" onmouseout="this.style.background='transparent'">
                                 <td style="padding: 12px 10px;">#${item.id}</td>
-                                <td style="padding: 12px 10px; font-weight: 500; display:flex; align-items:center; gap:8px;">
-                                    <img src="${item.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(item.display_name) + '&background=random'}" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
-                                    ${item.display_name}
+                                <td style="padding: 12px 10px; font-weight: 600; color: ${item.color};">${item.key_name}</td>
+                                <td style="padding: 12px 10px; font-weight: 500;">${item.name}</td>
+                                <td style="padding: 12px 10px;">
+                                    <div style="display:flex; align-items:center; gap: 8px;">
+                                        <div style="width:20px; height:20px; border-radius:4px; background:${item.color};"></div>
+                                        ${item.color}
+                                    </div>
                                 </td>
-                                <td style="padding: 12px 10px; color: var(--slate-600);">${item.email}</td>
-                                <td style="padding: 12px 10px;">${date}</td>
+                                <td style="padding: 12px 10px; color: var(--slate-600);">${item.bg_color || '-'}</td>
+                                <td style="padding: 12px 10px;">
+                                    <a href="${item.url}" target="_blank" style="color:var(--blue-600); text-decoration:underline; font-size:0.875rem; word-break: break-all; max-width: 200px; display: inline-block;">
+                                        ${item.url ? (item.url.length > 30 ? item.url.substring(0,30) + '...' : item.url) : 'Không có'}
+                                    </a>
+                                </td>
                                 <td style="padding: 12px 10px; text-align: center;">
-                                    <button class="btn btn-sm btn-icon" style="color:var(--blue-500); margin-right: 8px;" onclick="openModal('edit', ${item.id}, '${item.display_name}', '${item.email}')" title="Sửa thông tin"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn btn-sm btn-icon" style="color:var(--red-500);" onclick="deleteFarmer(${item.id})" title="Xóa tài khoản"><i class="fa-solid fa-trash"></i></button>
+                                    <button class="btn btn-sm btn-icon" style="color:var(--blue-500); margin-right: 8px;" onclick="openModal('edit', ${item.id}, '${item.key_name}', '${item.name}', '${item.color}', '${item.bg_color || ''}', '${item.url || ''}')" title="Sửa thông tin"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="btn btn-sm btn-icon" style="color:var(--red-500);" onclick="deleteProduct(${item.id})" title="Xóa Nông sản"><i class="fa-solid fa-trash"></i></button>
                                 </td>
                             </tr>
                         `;
@@ -226,62 +244,56 @@
                 }
             } catch (err) {
                 console.error(err);
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 20px; color: var(--red-500);">Lỗi kết nối Server!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px; color: var(--red-500);">Lỗi kết nối Server!</td></tr>`;
             }
         }
 
-        function openModal(mode, id=null, name='', email='') {
+        function openModal(mode, id=null, key_name='', name='', color='#3b82f6', bg_color='', url='') {
             modalMode = mode;
-            const modal = document.getElementById('farmerModal');
-            document.getElementById('farmerId').value = id || '';
-            document.getElementById('display_name').value = name;
+            const modal = document.getElementById('productModal');
+            document.getElementById('productId').value = id || '';
+            document.getElementById('key_name').value = key_name;
+            document.getElementById('name').value = name;
+            document.getElementById('color').value = color;
+            document.getElementById('bg_color').value = bg_color || 'rgba(59, 130, 246, 0.1)';
+            document.getElementById('url').value = url;
             
             if (mode === 'edit') {
-                document.getElementById('modalTitle').innerText = 'Chỉnh sửa Nông dân';
-                document.getElementById('email').value = email;
-                document.getElementById('email').readOnly = true;
-                document.getElementById('email').style.background = 'var(--slate-100)';
-                document.getElementById('password').required = false;
-                document.getElementById('passwordHelp').style.display = 'block';
+                document.getElementById('modalTitle').innerText = 'Chỉnh sửa Nông sản';
             } else {
-                document.getElementById('modalTitle').innerText = 'Thêm Nông dân Mới';
-                document.getElementById('email').value = '';
-                document.getElementById('email').readOnly = false;
-                document.getElementById('email').style.background = '#fff';
-                document.getElementById('password').value = '';
-                document.getElementById('password').required = true;
-                document.getElementById('passwordHelp').style.display = 'none';
+                document.getElementById('modalTitle').innerText = 'Thêm Nông sản Mới';
+                document.getElementById('color').value = '#10b981'; // default emerald
+                document.getElementById('bg_color').value = 'rgba(16, 185, 129, 0.1)';
             }
             modal.classList.add('active');
         }
 
         function closeModal() {
-            document.getElementById('farmerModal').classList.remove('active');
-            document.getElementById('farmerForm').reset();
+            document.getElementById('productModal').classList.remove('active');
+            document.getElementById('productForm').reset();
         }
 
-        async function saveFarmer() {
-            const id = document.getElementById('farmerId').value;
-            const display_name = document.getElementById('display_name').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+        async function saveProduct() {
+            const id = document.getElementById('productId').value;
+            const key_name = document.getElementById('key_name').value;
+            const name = document.getElementById('name').value;
+            const url = document.getElementById('url').value;
+            const color = document.getElementById('color').value;
+            const bg_color = document.getElementById('bg_color').value;
+
             const btn = document.getElementById('submitBtn');
+            const payload = { key_name, name, url, color, bg_color };
 
-            const payload = { display_name, password };
-            if (modalMode === 'add') {
-                payload.email = email;
-            }
-
-            const url = modalMode === 'add' 
-                ? 'http://localhost:3000/api/admin/farmers' 
-                : `http://localhost:3000/api/admin/farmers/${id}`;
+            const endpointUrl = modalMode === 'add' 
+                ? 'http://localhost:3000/api/admin/products' 
+                : `http://localhost:3000/api/admin/products/${id}`;
             const method = modalMode === 'add' ? 'POST' : 'PUT';
 
             btn.disabled = true;
             btn.innerText = 'Đang lưu...';
 
             try {
-                const res = await fetch(url, {
+                const res = await fetch(endpointUrl, {
                     method: method,
                     headers: { 
                         'Content-Type': 'application/json',
@@ -293,7 +305,7 @@
                 if (res.ok) {
                     alert(result.message);
                     closeModal();
-                    loadFarmers();
+                    loadProducts();
                 } else {
                     alert(result.error || 'Đã có lỗi xảy ra');
                 }
@@ -305,22 +317,22 @@
             btn.innerText = 'Lưu lại';
         }
 
-        async function deleteFarmer(id) {
-            if (confirm('Bạn có chắc chắn muốn xóa nông dân này vĩnh viễn? Mọi dữ liệu liên quan có thể biến mất.')) {
+        async function deleteProduct(id) {
+            if (confirm('Bạn có chắc chắn muốn xóa nông sản này không? Các biểu đồ liên quan có thể bị lỗi nếu chưa gỡ bỏ chúng.')) {
                 try {
-                    const res = await fetch(`http://localhost:3000/api/admin/farmers/${id}`, {
+                    const res = await fetch(`http://localhost:3000/api/admin/products/${id}`, {
                         method: 'DELETE',
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
                     const result = await res.json();
                     if (res.ok) {
                         alert(result.message);
-                        loadFarmers();
+                        loadProducts();
                     } else {
                         alert(result.error || 'Lỗi khi xóa!');
                     }
                 } catch(err) {
-                    alert('Lỗi kết nối cấu hình!');
+                    alert('Lỗi kết nối máy chủ!');
                 }
             }
         }

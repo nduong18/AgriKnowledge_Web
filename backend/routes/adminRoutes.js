@@ -9,6 +9,8 @@ router.use(verifyToken, isAdmin);
 router.get('/dashboard', adminController.getDashboardStats);
 router.get('/products', adminController.getProducts);
 router.post('/products', adminController.addProduct);
+router.put('/products/:id', adminController.updateProduct);
+router.delete('/products/:id', adminController.deleteProduct);
 
 // Farmers Management
 router.get('/farmers', adminController.getAllFarmers);
