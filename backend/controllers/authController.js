@@ -58,7 +58,8 @@ exports.login = async (req, res) => {
                 id: user.id,
                 email: user.email,
                 role: user.role,
-                display_name: user.display_name
+                display_name: user.display_name,
+                avatar: user.avatar
             }
         });
     } catch (error) {
@@ -81,5 +82,45 @@ exports.createAdmin = async (req, res) => {
         res.status(201).json({ message: 'Đã tạo tài khoản admin thành công!' });
     } catch(err) {
         res.status(500).json({ error: err.message });
+    }
+};
+
+exports.updateProfile = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { display_name, avatar, password } = req.body;
+
+        // Fetch current user
+        const [users] = await db.query('SELECT * FROM users WHERE id = ?', [userId]);
+        if (users.length === 0) {
+            return res.status(404).json({ error: 'Không tìm thấy người dùng' });
+        }
+        const currentUser = users[0];
+
+        let updateQuery = 'UPDATE users SET display_name = ?, avatar = ?';
+        let queryParams = [
+            display_name || currentUser.display_name,
+            avatar !== undefined ? avatar : currentUser.avatar
+        ];
+
+        // Update password if provided
+        if (password) {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            updateQuery += ', password = ?';
+            queryParams.push(hashedPassword);
+        }
+
+        updateQuery += ' WHERE id = ?';
+        queryParams.push(userId);
+
+        await db.query(updateQuery, queryParams);
+
+        // Fetch updated user to return
+        const [updatedUsers] = await db.query('SELECT id, email, display_name, role, avatar FROM users WHERE id = ?', [userId]);
+        
+        res.json({ message: 'Cập nhật hồ sơ thành công', user: updatedUsers[0] });
+    } catch (error) {
+        console.error('Lỗi cập nhật hồ sơ:', error);
+        res.status(500).json({ error: 'Lỗi server' });
     }
 };

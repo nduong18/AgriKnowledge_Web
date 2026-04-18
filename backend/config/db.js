@@ -45,6 +45,11 @@ async function initDB() {
             await pool.query("ALTER TABLE users ADD COLUMN display_name VARCHAR(255) DEFAULT 'Người dùng mới'");
         } catch(e) { /* Lỗi Duplicate column tức là cột đã tồn tại, có thể bỏ qua */ }
 
+        // Auto-migrate to add avatar
+        try {
+            await pool.query("ALTER TABLE users ADD COLUMN avatar VARCHAR(500) DEFAULT NULL");
+        } catch(e) { /* Lỗi Duplicate column tức là cột đã tồn tại, có thể bỏ qua */ }
+
         // Mở rộng Bảng Nông sản (Products) cho bộ Crawler Web
         const createProductsTableCmd = `
         CREATE TABLE IF NOT EXISTS products (
