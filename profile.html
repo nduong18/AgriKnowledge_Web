@@ -14,11 +14,14 @@
     <link rel="stylesheet" href="css/style.css">
     <style>
         .profile-container {
-            max-width: 600px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
             background: white;
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: var(--shadow-sm);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 4px 6px -1px var(--slate-200), 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--slate-100);
         }
         .profile-header {
             display: flex;
@@ -44,10 +47,18 @@
         }
         .profile-input {
             width: 100%;
-            padding: 10px 14px;
-            border: 1px solid var(--slate-200);
-            border-radius: 8px;
+            padding: 14px 18px;
+            border: 1px solid var(--slate-300);
+            border-radius: 10px;
             font-family: inherit;
+            font-size: 1rem;
+            color: var(--slate-800);
+            transition: all 0.2s ease;
+        }
+        .profile-input:focus {
+            outline: none;
+            border-color: var(--emerald-500);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
         }
     </style>
 </head>
@@ -101,6 +112,11 @@
                     <div id="profile-alert" style="display: none; padding: 12px; border-radius: 8px; margin-bottom: 16px;"></div>
 
                     <div class="profile-form-group">
+                        <label for="email_display">Địa chỉ Email</label>
+                        <input type="email" id="email_display" class="profile-input" style="background-color: var(--slate-50); color: var(--slate-500); cursor: not-allowed;" readonly>
+                    </div>
+
+                    <div class="profile-form-group">
                         <label for="display_name">Tên hiển thị</label>
                         <input type="text" id="display_name" class="profile-input" placeholder="Nhập tên hiển thị mới">
                     </div>
@@ -115,8 +131,8 @@
                         <input type="password" id="password" autocomplete="new-password" class="profile-input" placeholder="Nhập mật khẩu mới">
                     </div>
 
-                    <div style="margin-top: 24px; display:flex; justify-content: flex-end;">
-                        <button type="submit" class="btn btn-primary" id="save-profile-btn" style="padding: 10px 24px;">
+                    <div style="margin-top: 32px; display:flex; justify-content: flex-end;">
+                        <button type="submit" class="btn btn-primary" id="save-profile-btn" style="padding: 14px 32px; font-size: 1.05rem; border-radius: 10px; font-weight: 600;">
                             Lưu thông tin
                         </button>
                     </div>
@@ -139,6 +155,7 @@
             const defaultAvatar = 'https://images.unsplash.com/photo-1599839619722-39751411ea63?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80';
             
             // Populate fields
+            document.getElementById('email_display').value = user.email || '';
             document.getElementById('display_name').value = user.display_name || '';
             document.getElementById('avatar_url').value = user.avatar || '';
             document.getElementById('profile-display-name').textContent = user.display_name || user.email;
