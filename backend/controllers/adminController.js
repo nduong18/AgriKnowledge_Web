@@ -100,7 +100,17 @@ exports.deleteProduct = async (req, res) => {
 // Farmers Management
 exports.getAllFarmers = async (req, res) => {
     try {
-        const [rows] = await db.query("SELECT id, email, display_name, role, avatar, created_at FROM users WHERE role = 'farmer' ORDER BY created_at DESC");
+        const { search } = req.query;
+        let sql = "SELECT id, email, display_name, role, avatar, created_at FROM users WHERE role = 'farmer'";
+        let params = [];
+        
+        if (search) {
+            sql += " AND (display_name LIKE ? OR email LIKE ?)";
+            params.push(`%${search}%`, `%${search}%`);
+        }
+        
+        sql += " ORDER BY created_at DESC";
+        const [rows] = await db.query(sql, params);
         res.json(rows);
     } catch(err) {
         console.error(err);

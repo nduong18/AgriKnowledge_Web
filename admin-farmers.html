@@ -89,9 +89,12 @@
             
             <!-- User table -->
             <div class="widget" style="margin-top: 24px;">
-                <div class="widget-head" style="margin-bottom: 15px;">
+                <div class="widget-head" style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap;">
                     <h4>Danh sách Nông dân trong Hệ thống</h4>
-                    <button class="btn btn-sm btn-outline-emerald" onclick="loadFarmers()"><i class="fa-solid fa-rotate-right"></i> Làm mới</button>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm tên, email..." style="padding: 6px 12px; width: 250px;" oninput="handleSearch()">
+                        <button class="btn btn-sm btn-outline-emerald" onclick="loadFarmers()"><i class="fa-solid fa-rotate-right"></i> Làm mới</button>
+                    </div>
                 </div>
                 <div style="overflow-x: auto;">
                     <table style="width: 100%; border-collapse: collapse; text-align: left;">
@@ -189,10 +192,19 @@
             }
         });
 
+        let searchTimeout;
+        function handleSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                loadFarmers();
+            }, 400); // Debounce search
+        }
+
         async function loadFarmers() {
             const tbody = document.getElementById('farmer-list-table');
+            const searchPattern = document.getElementById('searchInput') ? document.getElementById('searchInput').value : '';
             try {
-                const response = await fetch('http://localhost:3000/api/admin/farmers', {
+                const response = await fetch(`http://localhost:3000/api/admin/farmers?search=${encodeURIComponent(searchPattern)}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (response.ok) {
