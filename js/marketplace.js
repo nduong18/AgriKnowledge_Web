@@ -3,6 +3,19 @@ const provincesData = [
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
+    const formatPostDateTime = (dateString) => {
+        if (!dateString) return 'Không rõ thời gian';
+        const date = new Date(dateString);
+        if (Number.isNaN(date.getTime())) return 'Không rõ thời gian';
+        return date.toLocaleString('vi-VN', {
+            hour: '2-digit',
+            minute: '2-digit',
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    };
+
     // Inject Datalist globally
     const dataList = document.createElement('datalist');
     dataList.id = 'provinceList';
@@ -67,7 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Reset về chế độ tạo mới
         editingPostId = null;
         document.getElementById('post-form').reset();
-        document.getElementById('image-preview').innerHTML = '';
         document.getElementById('post-modal-title').innerText = user.role === 'merchant' ? 'Đăng tin Cần mua' : 'Đăng tin Cần bán';
         document.getElementById('submit-post-btn').innerText = 'Đăng tin';
         postModal.classList.add('show');
@@ -108,6 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fetchPosts = async () => {
         try {
             const type = document.getElementById('filter-type').value;
+            const owner = document.getElementById('filter-owner').value;
             const category = document.getElementById('filter-category').value;
             const location = document.getElementById('filter-location').value;
             
@@ -118,13 +131,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const res = await fetch(`${API_URL_MARKETPLACE}?${query.toString()}`);
             const posts = await res.json();
-            renderFeed(posts);
+
+            let filteredPosts = posts;
+            if (owner === 'mine') {
+                filteredPosts = posts.filter(post => String(post.user_id) === String(user.id));
+            } else if (owner === 'others') {
+                filteredPosts = posts.filter(post => String(post.user_id) !== String(user.id));
+            }
+
+            renderFeed(filteredPosts);
         } catch (error) {
             console.error('Lỗi tải bảng tin:', error);
         }
     };
 
     document.getElementById('filter-type').addEventListener('change', fetchPosts);
+    document.getElementById('filter-owner').addEventListener('change', fetchPosts);
     document.getElementById('filter-category').addEventListener('change', fetchPosts);
     document.getElementById('filter-location').addEventListener('input', debounce(fetchPosts, 500));
 
@@ -167,6 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="mc-info"><i class="fa-solid fa-layer-group"></i> Loại: ${post.category || 'Khác'}</div>
                     <div class="mc-info"><i class="fa-solid fa-weight-scale"></i> SL: ${post.quantity || 'Thỏa thuận'}</div>
                     <div class="mc-info"><i class="fa-solid fa-location-dot"></i> Nơi ở: ${post.location || 'Không rõ'}</div>
+                    <div class="mc-info"><i class="fa-regular fa-clock"></i> Đăng lúc: ${formatPostDateTime(post.created_at)}</div>
                     ${verifiedHtml}
                     <div style="margin-top: 10px; font-size: 0.9rem; color: #475569; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
                         ${post.description || ''}

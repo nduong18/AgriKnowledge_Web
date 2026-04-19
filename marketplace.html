@@ -89,6 +89,82 @@
         .chat-bubble { max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: 0.95rem; }
         .chat-self { background: var(--emerald-500); color: white; align-self: flex-end; border-bottom-right-radius: 2px;}
         .chat-other { background: white; color: #1e293b; align-self: flex-start; border-bottom-left-radius: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);}
+
+        .marketplace-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: calc(100vh - 180px);
+        }
+
+        .marketplace-filters {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(170px, 1fr));
+            gap: 12px;
+            background: #fff;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .marketplace-filters .control-group {
+            min-width: 0;
+        }
+
+        .marketplace-filters label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .marketplace-feed-wrap {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            padding: 16px;
+            height: calc(100vh - 260px);
+            min-height: 560px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        #marketplace-feed {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        @media (max-width: 1200px) {
+            .marketplace-filters {
+                grid-template-columns: repeat(2, minmax(170px, 1fr));
+            }
+
+            .marketplace-feed-wrap {
+                height: auto;
+                max-height: 78vh;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .marketplace-layout {
+                min-height: auto;
+            }
+
+            .marketplace-filters {
+                grid-template-columns: 1fr;
+            }
+
+            .marketplace-feed-wrap {
+                height: auto;
+                max-height: none;
+                overflow: visible;
+                padding: 0;
+                background: transparent;
+                box-shadow: none;
+            }
+        }
     </style>
 </head>
 <body class="dashboard-page">
@@ -134,37 +210,49 @@
                 </div>
             </header>
 
-            <!-- Filters -->
-            <div class="widget marketplace-filters" style="margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-                <div class="control-group" style="flex: 1; min-width: 200px;">
-                    <label>Loại tin:</label>
-                    <select id="filter-type" class="dash-select">
-                        <option value="">Tất cả</option>
-                        <option value="sell">Cần bán (Từ nhà vườn)</option>
-                        <option value="buy">Cần mua (Từ thương lái)</option>
-                    </select>
+            <div class="marketplace-layout">
+                <!-- Filters -->
+                <div class="widget marketplace-filters">
+                    <div class="control-group">
+                        <label>Loại tin:</label>
+                        <select id="filter-type" class="dash-select">
+                            <option value="">Tất cả</option>
+                            <option value="sell">Cần bán (Từ nhà vườn)</option>
+                            <option value="buy">Cần mua (Từ thương lái)</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Người đăng:</label>
+                        <select id="filter-owner" class="dash-select">
+                            <option value="">Tất cả</option>
+                            <option value="mine">Tin của tôi</option>
+                            <option value="others">Tin người khác</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Loại cây trồng:</label>
+                        <select id="filter-category" class="dash-select">
+                            <option value="">Tất cả</option>
+                            <option value="Lúa gạo">Lúa gạo</option>
+                            <option value="Trái cây">Trái cây</option>
+                            <option value="Rau củ">Rau củ</option>
+                            <option value="Cây công nghiệp">Cây công nghiệp</option>
+                            <option value="Khác">Khác</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Khu vực (Tỉnh/Thành):</label>
+                        <input type="text" id="filter-location" list="provinceList" class="form-control" placeholder="Tìm theo khu vực...">
+                    </div>
                 </div>
-                <div class="control-group" style="flex: 1; min-width: 200px;">
-                    <label>Loại cây trồng:</label>
-                    <select id="filter-category" class="dash-select">
-                        <option value="">Tất cả</option>
-                        <option value="Lúa gạo">Lúa gạo</option>
-                        <option value="Trái cây">Trái cây</option>
-                        <option value="Rau củ">Rau củ</option>
-                        <option value="Cây công nghiệp">Cây công nghiệp</option>
-                        <option value="Khác">Khác</option>
-                    </select>
-                </div>
-                <div class="control-group" style="flex: 1; min-width: 200px;">
-                    <label>Khu vực (Tỉnh/Thành):</label>
-                    <input type="text" id="filter-location" list="provinceList" class="form-control" placeholder="Tìm theo khu vực...">
-                </div>
-            </div>
 
-            <!-- Feed Grid -->
-            <div id="marketplace-feed" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
-                <!-- Feed items will be populated by JS -->
-                <p>Đang tải dữ liệu...</p>
+                <!-- Feed Grid -->
+                <div class="marketplace-feed-wrap">
+                    <div id="marketplace-feed">
+                        <!-- Feed items will be populated by JS -->
+                        <p>Đang tải dữ liệu...</p>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
