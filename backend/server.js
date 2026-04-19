@@ -6,6 +6,8 @@ const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const priceRoutes = require('./routes/priceRoutes');
 const newsRoutes = require('./routes/newsRoutes');
+const marketplaceRoutes = require('./routes/marketplaceRoutes');
+const messageRoutes = require('./routes/messageRoutes');
 
 const app = express();
 app.use(cors());
@@ -20,6 +22,8 @@ app.use('/api/prices', priceRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/news', newsRoutes);
+app.use('/api/marketplace', marketplaceRoutes);
+app.use('/api/messages', messageRoutes);
 
 const PORT = 3000;
 const server = app.listen(PORT, () => {

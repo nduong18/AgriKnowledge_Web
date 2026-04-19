@@ -4,7 +4,7 @@ const db = require('../config/db');
 
 exports.register = async (req, res) => {
     try {
-        const { email, password, display_name } = req.body;
+        const { email, password, display_name, role } = req.body;
         if (!email || !password) {
             return res.status(400).json({ error: 'Email và mật khẩu không được để trống' });
         }
@@ -15,10 +15,10 @@ exports.register = async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const role = 'farmer'; // Mặc định tự đăng ký là farmer
-        const validDisplayName = display_name || 'Nông dân mới';
+        const userRole = (role === 'merchant') ? 'merchant' : 'farmer';
+        const validDisplayName = display_name || (userRole === 'merchant' ? 'Thương lái mới' : 'Nông dân mới');
 
-        await db.query('INSERT INTO users (email, password, display_name, role) VALUES (?, ?, ?, ?)', [email, hashedPassword, validDisplayName, role]);
+        await db.query('INSERT INTO users (email, password, display_name, role) VALUES (?, ?, ?, ?)', [email, hashedPassword, validDisplayName, userRole]);
         res.status(201).json({ message: 'Đăng ký thành công!' });
     } catch (error) {
         console.error('Lỗi đăng ký:', error);

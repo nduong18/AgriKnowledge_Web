@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 5. Intercept mockup buttons (excluding valid navigational links)
     document.querySelectorAll('.btn-outline, .btn-outline-emerald, .dash-nav a').forEach(b => {
-        if(b.getAttribute('href') === '#' || !b.getAttribute('href')) {
+        if((b.getAttribute('href') === '#' || !b.getAttribute('href')) && !b.hasAttribute('id') && !b.classList.contains('btn-chat')) {
             b.addEventListener('click', (e) => {
                 e.preventDefault();
                 alert('Tính năng đang được phát triển. Yêu cầu kết nối Backend.');

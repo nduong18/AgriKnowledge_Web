@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Giao thương - Sổ tay Nông dân số</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="dashboard-page admin-theme">
+    <div class="saas-dashboard">
+        <!-- Sidebar -->
+        <aside class="dash-sidebar">
+            <button id="sidebarToggleBtn" class="floating-toggle-btn"><i class="fa-solid fa-angle-left" id="toggleIcon"></i></button>
+            <div class="sidebar-content-wrapper">
+                <div class="dash-profile">
+                    <img id="sidebar-avatar" src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Avatar Admin">
+                    <div class="dash-profile-info">
+                        <strong id="user-name-display">Administrator</strong>
+                        <span class="badge" style="background:var(--red-100); color:var(--red-700);" id="user-role-display">Quản trị viên</span>
+                    </div>
+                </div>
+                <nav class="dash-nav">
+                    <a href="admin-farmers.html"><i class="fa-solid fa-users"></i> <span>Quản lý Nông dân</span></a>
+                    <a href="admin-products.html"><i class="fa-solid fa-seedling"></i> <span>Quản lý Nông sản</span></a>
+                    <a href="admin-news.html"><i class="fa-regular fa-newspaper"></i> <span>Quản lý Tin tức</span></a>
+                    <a href="admin-marketplace.html" class="active"><i class="fa-solid fa-handshake"></i> <span>Quản lý Giao thương</span></a>
+                    <a href="profile.html"><i class="fa-solid fa-user"></i> <span>Hồ sơ cá nhân</span></a>
+                    <a href="dashboard.html"><i class="fa-solid fa-house-user"></i> <span>Trang chủ Nông dân</span></a>
+                </nav>
+                <div style="margin-top: auto; padding: 20px 12px;">
+                    <a href="index.html" id="logout-btn" style="color: var(--red-500); text-decoration: none; display: flex; align-items: center; gap: 12px; padding: 10px 16px; font-weight: 500;"><i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="logout-text">Đăng xuất</span></a>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="dash-main">
+            <!-- Topbar -->
+            <header class="dash-topbar">
+                <div class="page-title">
+                    <h3>Quản lý Bài đăng Giao thương</h3>
+                    <p>Kiểm duyệt nội dung và cấp lại huy hiệu uy tín</p>
+                </div>
+            </header>
+            
+            <!-- Posts table -->
+            <div class="widget" style="margin-top: 24px;">
+                <div class="widget-head" style="margin-bottom: 15px;">
+                    <h4>Danh sách Đăng tin</h4>
+                    <button class="btn btn-sm btn-outline-emerald" onclick="loadPosts()" title="Tải lại bảng"><i class="fa-solid fa-rotate-right"></i></button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid var(--slate-200); color: var(--slate-500); background: var(--slate-50);">
+                                <th style="padding: 12px 10px; font-weight: 600;">ID</th>
+                                <th style="padding: 12px 10px; font-weight: 600;">Hình ảnh</th>
+                                <th style="padding: 12px 10px; font-weight: 600;">Người đăng</th>
+                                <th style="padding: 12px 10px; font-weight: 600;">Loại</th>
+                                <th style="padding: 12px 10px; font-weight: 600;">Hàng hóa / Vị trí</th>
+                                <th style="padding: 12px 10px; font-weight: 600;">Xác minh</th>
+                                <th style="padding: 12px 10px; font-weight: 600; text-align: center;">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="post-list-table">
+                            <tr><td colspan="7" style="text-align:center; padding: 20px;">Đang tải dữ liệu...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api/marketplace';
+        const token = localStorage.getItem('token');
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!token || !user || user.role !== 'admin') {
+                alert('Bạn không có quyền truy cập. Vui lòng đăng nhập bằng tài khoản Quản trị viên.');
+                window.location.href = 'login.html';
+                return;
+            }
+            loadPosts();
+
+            document.getElementById('logout-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = 'index.html';
+            });
+        });
+
+        async function loadPosts() {
+            const tbody = document.getElementById('post-list-table');
+            try {
+                const response = await fetch(API_URL, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    tbody.innerHTML = '';
+                    if(data.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px;">Hệ thống chưa có tin đăng nào.</td></tr>`;
+                        return;
+                    }
+                    data.forEach(item => {
+                        const isVerified = item.is_verified === 1;
+                        const isBuy = item.post_type === 'buy';
+                        const verifyBtnColor = isVerified ? 'var(--orange-500)' : 'var(--blue-500)';
+                        const verifyIcon = isVerified ? 'fa-solid fa-xmark' : 'fa-solid fa-check';
+                        const verifyTitle = isVerified ? 'Gỡ huy hiệu' : 'Cấp huy hiệu (Hàng từ vườn)';
+
+                        tbody.innerHTML += `
+                            <tr style="border-bottom: 1px solid var(--slate-100); transition: background 0.2s;" onmouseover="this.style.background='var(--slate-50)'" onmouseout="this.style.background='transparent'">
+                                <td style="padding: 12px 10px;">#${item.id}</td>
+                                <td style="padding: 12px 10px;">
+                                    ${item.image_url ? `<img src="${item.image_url}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;">` : '-'}
+                                </td>
+                                <td style="padding: 12px 10px; font-weight: 500;">
+                                    ${item.display_name}<br>
+                                    <small style="color: #64748b">${item.role}</small>
+                                </td>
+                                <td style="padding: 12px 10px;">
+                                    <span style="font-size: 0.8rem; padding: 3px 8px; border-radius: 4px; font-weight: 600; 
+                                        ${isBuy ? 'background:#ffedd5; color:#9a3412;' : 'background:#dcfce7; color:#166534;'}">
+                                        ${isBuy ? 'Cần mua' : 'Cần bán'}
+                                    </span>
+                                </td>
+                                <td style="padding: 12px 10px;">
+                                    <strong>${item.product_name}</strong><br>
+                                    <small><i class="fa-solid fa-location-dot"></i> ${item.location || 'Không rõ'}</small>
+                                </td>
+                                <td style="padding: 12px 10px;">
+                                    ${isVerified ? '<span style="color:var(--blue-600); font-weight:500;"><i class="fa-solid fa-circle-check"></i> Đã cấp</span>' : '<span style="color:var(--slate-400);">Chưa cấp</span>'}
+                                </td>
+                                <td style="padding: 12px 10px; text-align: center;">
+                                    <button class="btn btn-sm btn-icon" style="color:${verifyBtnColor}; margin-right: 8px;" onclick="toggleVerify(${item.id}, ${!isVerified})" title="${verifyTitle}"><i class="${verifyIcon}"></i></button>
+                                    <button class="btn btn-sm btn-icon" style="color:var(--red-500);" onclick="deletePost(${item.id})" title="Xóa Tin"><i class="fa-solid fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px; color: var(--red-500);">Lỗi kết nối Server!</td></tr>`;
+            }
+        }
+
+        async function toggleVerify(id, verifyState) {
+            try {
+                const res = await fetch(`${API_URL}/${id}/verify`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ is_verified: verifyState })
+                });
+                if (res.ok) {
+                    loadPosts();
+                } else {
+                    const data = await res.json();
+                    alert(data.error);
+                }
+            } catch (err) {
+                alert('Lỗi kết nối');
+            }
+        }
+
+        async function deletePost(id) {
+            if (!confirm('Chắc chắn muốn xóa bài đăng này?')) return;
+            try {
+                const res = await fetch(`${API_URL}/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    loadPosts();
+                } else {
+                    alert('Lỗi xóa bài');
+                }
+            } catch (err) {
+                alert('Lỗi kết nối');
+            }
+        }
+    </script>
+</body>
+</html>

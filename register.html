@@ -25,6 +25,20 @@
         
         <form id="register-form" style="display: flex; flex-direction: column; gap: 20px;">
             <div class="form-group">
+                <label>Bạn là ai?</label>
+                <div style="display: flex; gap: 20px; align-items: center; margin-top: 8px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; margin-bottom: 0;">
+                        <input type="radio" name="role" value="farmer" checked>
+                        <span style="color: var(--emerald-600);"><i class="fa-solid fa-seedling"></i> Nông dân</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; margin-bottom: 0;">
+                        <input type="radio" name="role" value="merchant">
+                        <span style="color: var(--orange-500);"><i class="fa-solid fa-truck-fast"></i> Thương lái</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
                 <label for="display-name">Tên hiển thị</label>
                 <input type="text" id="display-name" class="form-control" placeholder="Ví dụ: Nguyễn Văn A" required>
             </div>

@@ -34,7 +34,7 @@ async function initDB() {
             email VARCHAR(255) UNIQUE NOT NULL,
             password VARCHAR(255) NOT NULL,
             display_name VARCHAR(255) DEFAULT 'Người dùng mới',
-            role ENUM('farmer', 'admin') DEFAULT 'farmer',
+            role ENUM('farmer', 'admin', 'merchant') DEFAULT 'farmer',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         `;
@@ -49,6 +49,11 @@ async function initDB() {
         try {
             await pool.query("ALTER TABLE users ADD COLUMN avatar VARCHAR(500) DEFAULT NULL");
         } catch(e) { /* Lỗi Duplicate column tức là cột đã tồn tại, có thể bỏ qua */ }
+
+        // Auto-migrate to update role enum
+        try {
+            await pool.query("ALTER TABLE users MODIFY COLUMN role ENUM('farmer', 'admin', 'merchant') DEFAULT 'farmer'");
+        } catch(e) { console.warn('Lỗi cập nhật cột role', e.message); }
 
         // Mở rộng Bảng Nông sản (Products) cho bộ Crawler Web
         const createProductsTableCmd = `
@@ -96,7 +101,41 @@ async function initDB() {
         `;
         await pool.query(createNewsTableCmd);
 
-        console.log('✅ Cơ sở dữ liệu MySQL và bảng users, products, news đã sẵn sàng.');
+        // Bảng Giao thương (Marketplace Posts)
+        const createMarketplaceCmd = `
+        CREATE TABLE IF NOT EXISTS marketplace_posts (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            post_type ENUM('sell', 'buy') NOT NULL,
+            category VARCHAR(100),
+            product_name VARCHAR(255) NOT NULL,
+            quantity VARCHAR(100),
+            location VARCHAR(255),
+            description TEXT,
+            image_url LONGTEXT,
+            is_verified BOOLEAN DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+        `;
+        await pool.query(createMarketplaceCmd);
+
+        // Bảng Tin nhắn (Messages)
+        const createMessagesCmd = `
+        CREATE TABLE IF NOT EXISTS messages (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            sender_id INT NOT NULL,
+            receiver_id INT NOT NULL,
+            content TEXT NOT NULL,
+            is_read BOOLEAN DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+        `;
+        await pool.query(createMessagesCmd);
+
+        console.log('✅ Cơ sở dữ liệu MySQL và các bảng đã sẵn sàng (bao gồm giao thương & tin nhắn).');
     } catch (error) {
         console.error('❌ Lỗi khởi tạo CSDL MySQL:', error.message);
     }
