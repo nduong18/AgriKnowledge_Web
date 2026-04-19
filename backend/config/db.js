@@ -79,8 +79,24 @@ async function initDB() {
                 await pool.query('INSERT IGNORE INTO products (key_name, name, url, color, bg_color) VALUES (?, ?, ?, ?, ?)', p);
             }
         }
-        
-        console.log('✅ Cơ sở dữ liệu MySQL và bảng users, products đã sẵn sàng.');
+
+        // Bảng Tin tức Nông nghiệp (News)
+        const createNewsTableCmd = `
+        CREATE TABLE IF NOT EXISTS news (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            admin_id INT,
+            author_name VARCHAR(255) DEFAULT 'Admin',
+            title VARCHAR(500) NOT NULL,
+            thumbnail_url VARCHAR(1024),
+            content LONGTEXT NOT NULL,
+            is_published TINYINT(1) DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        );
+        `;
+        await pool.query(createNewsTableCmd);
+
+        console.log('✅ Cơ sở dữ liệu MySQL và bảng users, products, news đã sẵn sàng.');
     } catch (error) {
         console.error('❌ Lỗi khởi tạo CSDL MySQL:', error.message);
     }
