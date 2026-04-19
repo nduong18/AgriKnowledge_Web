@@ -8,6 +8,9 @@
     /* Brand Colors - Emerald / Green theme */
     --emerald-50:  #ecfdf5;
     --emerald-100: #d1fae5;
+    --emerald-200: #a7f3d0;
+    --emerald-300: #6ee7b7;
+    --emerald-400: #34d399;
     --emerald-500: #10b981;
     --emerald-600: #059669;
     --emerald-700: #047857;
@@ -22,8 +25,13 @@
     --slate-900: #0f172a;
 
     /* Accents */
-    --blue-500:   #3b82f6;
+    --blue-50:    #eff6ff;
     --blue-100:   #dbeafe;
+    --blue-200:   #bfdbfe;
+    --blue-400:   #60a5fa;
+    --blue-500:   #3b82f6;
+    --blue-600:   #2563eb;
+    --blue-700:   #1d4ed8;
     --purple-500: #8b5cf6;
     --purple-100: #ede9fe;
     --orange-500: #f97316;
@@ -338,13 +346,13 @@ h1, h2, h3, h4 { font-weight: 700; color: var(--slate-900); }
 .auth-back { position: absolute; top: 30px; left: 30px; color: var(--slate-600); text-decoration: none; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: var(--transition); }
 .auth-back:hover { color: var(--emerald-600); transform: translateX(-5px); }
 
-/* Admin Theme Overrides - Bright Blue Theme */
+/* Admin Theme Overrides - Emerald Theme */
 .admin-theme .dash-sidebar {
-    background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
-    border-right: 1px solid var(--blue-100);
+    background: linear-gradient(180deg, var(--emerald-50) 0%, #ffffff 100%);
+    border-right: 1px solid var(--emerald-100);
 }
 .admin-theme .dash-sidebar .dash-profile {
-    border-bottom: 1px solid var(--blue-100);
+    border-bottom: 1px solid var(--emerald-100);
 }
 .admin-theme .dash-sidebar .dash-profile strong {
     color: var(--slate-800);
@@ -354,51 +362,51 @@ h1, h2, h3, h4 { font-weight: 700; color: var(--slate-900); }
 }
 .admin-theme .dash-sidebar .dash-nav a:hover, 
 .admin-theme .dash-sidebar .dash-nav a.active {
-    background-color: var(--blue-100);
-    color: var(--blue-600);
+    background-color: var(--emerald-100);
+    color: var(--emerald-600);
 }
 .admin-theme .dash-sidebar .floating-toggle-btn {
     background-color: white;
-    border-color: var(--blue-200);
-    color: var(--blue-600);
+    border-color: var(--emerald-200);
+    color: var(--emerald-600);
 }
 .admin-theme .dash-sidebar .floating-toggle-btn:hover {
-    color: var(--blue-700);
-    border-color: var(--blue-400);
-    background-color: var(--blue-50);
+    color: var(--emerald-700);
+    border-color: var(--emerald-400);
+    background-color: var(--emerald-50);
 }
 .admin-theme .dash-main {
-    background: #f8faff;
+    background: var(--slate-50);
 }
 .admin-theme .dash-topbar {
     background: white;
-    border-bottom: 1px solid var(--blue-100);
+    border-bottom: 1px solid var(--emerald-100);
 }
 .admin-theme .dash-topbar .page-title h3 {
-    color: var(--blue-700);
+    color: var(--emerald-700);
 }
 .admin-theme .dash-topbar .page-title p {
     color: var(--slate-500);
 }
-.admin-theme .dash-controls .btn-primary {
-    background: var(--blue-600);
-    box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.39);
+.admin-theme .btn-primary {
+    background: var(--emerald-600);
+    box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.39);
 }
-.admin-theme .dash-controls .btn-primary:hover {
-    background: var(--blue-700);
+.admin-theme .btn-primary:hover {
+    background: var(--emerald-700);
 }
 .admin-theme .dash-topbar .btn-icon {
     background: white;
-    border-color: var(--blue-200);
-    color: var(--blue-500);
+    border-color: var(--emerald-200);
+    color: var(--emerald-500);
 }
 .admin-theme .dash-topbar .btn-icon:hover {
-    background: var(--blue-50);
-    color: var(--blue-600);
+    background: var(--emerald-50);
+    color: var(--emerald-600);
 }
 .admin-theme .widget {
-    border-color: var(--blue-100);
-    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.05);
+    border-color: var(--emerald-100);
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.05);
 }
 
 /* Responsive */
