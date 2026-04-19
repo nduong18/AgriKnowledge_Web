@@ -5,6 +5,7 @@ const authMiddleware = require('../middleware/authMiddleware'); // make sure aut
 
 router.get('/', marketplaceController.getPosts);
 router.post('/', authMiddleware.verifyToken, marketplaceController.createPost);
+router.put('/:id', authMiddleware.verifyToken, marketplaceController.updatePost);
 router.delete('/:id', authMiddleware.verifyToken, marketplaceController.deletePost);
 
 // Admin routes

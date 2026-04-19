@@ -64,6 +64,39 @@ exports.createPost = async (req, res) => {
     }
 };
 
+exports.updatePost = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const postId = req.params.id;
+        const { product_name, category, quantity, location, description, image_url } = req.body;
+
+        if (!product_name) {
+            return res.status(400).json({ error: 'Vui lòng nhập tên nông sản' });
+        }
+
+        // Check ownership
+        const [posts] = await db.query('SELECT user_id FROM marketplace_posts WHERE id = ?', [postId]);
+        if (posts.length === 0) return res.status(404).json({ error: 'Không tìm thấy bài viết' });
+        
+        if (req.user.role !== 'admin' && posts[0].user_id !== userId) {
+            return res.status(403).json({ error: 'Bạn không có quyền sửa bài viết này' });
+        }
+
+        const updateQuery = `
+            UPDATE marketplace_posts 
+            SET product_name = ?, category = ?, quantity = ?, location = ?, description = ?, image_url = ?
+            WHERE id = ?
+        `;
+        const params = [product_name, category || null, quantity || null, location || null, description || null, image_url || null, postId];
+        
+        await db.query(updateQuery, params);
+        res.json({ message: 'Cập nhật tin thành công' });
+    } catch (error) {
+        console.error('Lỗi cập nhật tin đăng:', error);
+        res.status(500).json({ error: 'Lỗi server' });
+    }
+};
+
 exports.verifyPost = async (req, res) => {
     try {
         const postId = req.params.id;

@@ -48,6 +48,12 @@
         .inbox-item-name { font-weight: 600; color: #1e293b; margin-bottom: 2px; }
         .inbox-item-role { font-size: 0.8rem; color: #64748b; }
 
+        .btn-outline-danger { border: 1px solid var(--red-400); color: var(--red-500); background: white; border-radius: 6px; cursor: pointer; padding: 4px 10px; transition: all 0.2s; }
+        .btn-outline-danger:hover { background: var(--red-50); color: var(--red-600); border-color: var(--red-500); }
+        .btn-edit-post, .btn-delete-post { font-size: 0.85rem; }
+        .btn-edit-post { border: 1px solid var(--slate-300); color: var(--slate-600); background: white; border-radius: 6px; cursor: pointer; padding: 4px 10px; transition: all 0.2s; }
+        .btn-edit-post:hover { background: var(--emerald-50); color: var(--emerald-600); border-color: var(--emerald-400); }
+
         .market-card {
             background: white;
             border-radius: 12px;
@@ -151,7 +157,7 @@
                 </div>
                 <div class="control-group" style="flex: 1; min-width: 200px;">
                     <label>Khu vực (Tỉnh/Thành):</label>
-                    <input type="text" id="filter-location" class="form-control" placeholder="Tìm theo khu vực...">
+                    <input type="text" id="filter-location" list="provinceList" class="form-control" placeholder="Tìm theo khu vực...">
                 </div>
             </div>
 
@@ -185,11 +191,20 @@
                 </div>
                 <div class="form-group">
                     <label>Sản lượng / Hàng yêu cầu</label>
-                    <input type="text" id="post-quantity" class="form-control" placeholder="Ví dụ: 10 Tấn, hoặc Mua 5 Tấn">
+                    <div style="display: flex; gap: 10px;">
+                        <input type="number" step="any" id="post-quantity-value" class="form-control" style="flex: 2" placeholder="Ví dụ: 100..." required>
+                        <select id="post-quantity-unit" class="dash-select" style="flex: 1">
+                            <option value="Tấn">Tấn</option>
+                            <option value="Tạ">Tạ</option>
+                            <option value="Yến">Yến</option>
+                            <option value="Kg">Kg</option>
+                            <option value="Gram">Gram</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Khu vực / Địa điểm canh tác/thu mua</label>
-                    <input type="text" id="post-location" class="form-control" placeholder="Cần Thơ, hoặc Đồng Tháp...">
+                    <input type="text" id="post-location" list="provinceList" class="form-control" placeholder="Cần Thơ, hoặc Đồng Tháp...">
                 </div>
                 <div class="form-group">
                     <label>Mô tả chi tiết</label>
@@ -197,9 +212,7 @@
                 </div>
                 <div class="form-group">
                     <label>Hình ảnh Minh họa (Tùy chọn)</label>
-                    <input type="file" id="post-image-file" class="form-control" accept="image/*">
-                    <div id="image-preview" style="margin-top: 10px; max-height: 200px; max-width: 100%; overflow: hidden; border-radius: 8px;"></div>
-                    <input type="hidden" id="post-image-url">
+                    <input type="url" id="post-image-url" class="form-control" placeholder="Nhập đường dẫn liên kết (URL) của ảnh...">
                 </div>
                 <button type="submit" class="btn btn-primary" style="margin-top: 10px;" id="submit-post-btn">Đăng tin</button>
             </form>

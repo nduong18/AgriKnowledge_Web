@@ -1,4 +1,19 @@
+const provincesData = [
+    "Hà Nội", "Hà Giang", "Cao Bằng", "Bắc Kạn", "Tuyên Quang", "Lào Cai", "Điện Biên", "Lai Châu", "Sơn La", "Yên Bái", "Hòa Bình", "Thái Nguyên", "Lạng Sơn", "Quảng Ninh", "Bắc Giang", "Phú Thọ", "Vĩnh Phúc", "Bắc Ninh", "Hải Dương", "Hải Phòng", "Hưng Yên", "Thái Bình", "Hà Nam", "Nam Định", "Ninh Bình", "Thanh Hóa", "Nghệ An", "Hà Tĩnh", "Quảng Bình", "Quảng Trị", "Thừa Thiên Huế", "Đà Nẵng", "Quảng Nam", "Quảng Ngãi", "Bình Định", "Phú Yên", "Khánh Hòa", "Ninh Thuận", "Bình Thuận", "Kon Tum", "Gia Lai", "Đắk Lắk", "Đắk Nông", "Lâm Đồng", "Bình Phước", "Tây Ninh", "Bình Dương", "Đồng Nai", "Bà Rịa - Vũng Tàu", "Hồ Chí Minh", "Long An", "Tiền Giang", "Bến Tre", "Trà Vinh", "Vĩnh Long", "Đồng Tháp", "An Giang", "Kiên Giang", "Cần Thơ", "Hậu Giang", "Sóc Trăng", "Bạc Liêu", "Cà Mau"
+];
+
 document.addEventListener('DOMContentLoaded', () => {
+    // Inject Datalist globally
+    const dataList = document.createElement('datalist');
+    dataList.id = 'provinceList';
+    provincesData.forEach(p => {
+        const option = document.createElement('option');
+        option.value = p;
+        dataList.appendChild(option);
+    });
+    document.body.appendChild(dataList);
+    let editingPostId = null;
+    let currentPosts = [];
     const API_URL_MARKETPLACE = 'http://localhost:3000/api/marketplace';
     const API_URL_MESSAGES = 'http://localhost:3000/api/messages';
     
@@ -49,6 +64,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Modals open/close
     btnPostAd.addEventListener('click', () => {
+        // Reset về chế độ tạo mới
+        editingPostId = null;
+        document.getElementById('post-form').reset();
+        document.getElementById('image-preview').innerHTML = '';
+        document.getElementById('post-modal-title').innerText = user.role === 'merchant' ? 'Đăng tin Cần mua' : 'Đăng tin Cần bán';
+        document.getElementById('submit-post-btn').innerText = 'Đăng tin';
         postModal.classList.add('show');
     });
 
@@ -81,23 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Image Upload to Base64 logic
-    const imageInput = document.getElementById('post-image-file');
-    const imagePreview = document.getElementById('image-preview');
-    const imageUrlInput = document.getElementById('post-image-url');
-
-    imageInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const base64String = event.target.result;
-                imageUrlInput.value = base64String;
-                imagePreview.innerHTML = `<img src="${base64String}" style="width: 100%; height: auto; display: block;">`;
-            };
-            reader.readAsDataURL(file);
-        }
-    });
+    // Image preview removed - no live preview on URL input
 
     // Filters logic
     const fetchPosts = async () => {
@@ -132,6 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderFeed(posts) {
+        currentPosts = posts;
         const container = document.getElementById('marketplace-feed');
         container.innerHTML = '';
         if (posts.length === 0) {
@@ -170,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <img src="${post.avatar || 'https://via.placeholder.com/40'}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
                             <span style="font-size: 0.9rem; font-weight: 500;">${post.display_name}</span>
                         </div>
-                        ${String(post.user_id) !== String(user.id) ? `<button class="btn btn-sm btn-outline-emerald btn-chat" data-id="${post.user_id}" data-name="${post.display_name}">Nhắn tin</button>` : `<span style="font-size: 0.8rem; color: var(--emerald-600); font-weight: 500;"><i class="fa-solid fa-user-tag"></i> Tin của bạn</span>`}
+                        ${String(post.user_id) !== String(user.id) ? `<button class="btn btn-sm btn-outline-emerald btn-chat" data-id="${post.user_id}" data-name="${post.display_name}">Nhắn tin</button>` : `<div style="display: flex; gap: 5px;"><button class="btn btn-sm btn-outline btn-edit-post" data-id="${post.id}" title="Sửa bài"><i class="fa-solid fa-pen"></i></button><button class="btn btn-sm btn-outline-danger btn-delete-post" data-id="${post.id}" title="Xóa bài"><i class="fa-solid fa-trash"></i></button></div>`}
                     </div>
                 </div>
             `;
@@ -189,6 +195,61 @@ document.addEventListener('DOMContentLoaded', () => {
                 openChat(partnerId, partnerName);
             });
         });
+
+        // Add event listener for edit/delete
+        document.querySelectorAll('.btn-edit-post').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.currentTarget.getAttribute('data-id');
+                const post = currentPosts.find(p => p.id == id);
+                if (post) {
+                    editingPostId = post.id;
+                    document.getElementById('post-modal-title').innerText = 'Cập nhật tin giao thương';
+                    document.getElementById('submit-post-btn').innerText = 'Cập nhật';
+                    document.getElementById('post-name').value = post.product_name;
+                    document.getElementById('post-category').value = post.category || 'Khác';
+                    
+                    if (post.quantity) {
+                        const parts = post.quantity.split(' ');
+                        if (parts.length >= 2) {
+                            document.getElementById('post-quantity-value').value = parts[0];
+                            document.getElementById('post-quantity-unit').value = parts[1];
+                        } else {
+                            document.getElementById('post-quantity-value').value = post.quantity;
+                        }
+                    } else {
+                        document.getElementById('post-quantity-value').value = '';
+                    }
+                    
+                    document.getElementById('post-location').value = post.location || '';
+                    document.getElementById('post-desc').value = post.description || '';
+                    document.getElementById('post-image-url').value = post.image_url || '';
+                    
+                    postModal.classList.add('show');
+                }
+            });
+        });
+
+        document.querySelectorAll('.btn-delete-post').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const id = e.currentTarget.getAttribute('data-id');
+                if (confirm('Bạn có chắc chắn muốn xóa tin đăng này?')) {
+                    try {
+                        const res = await fetch(`${API_URL_MARKETPLACE}/${id}`, {
+                            method: 'DELETE',
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        const data = await res.json();
+                        if (res.ok) {
+                            fetchPosts();
+                        } else {
+                            alert(data.error || 'Có lỗi xảy ra');
+                        }
+                    } catch (err) {
+                        alert('Lỗi xóa bài');
+                    }
+                }
+            });
+        });
     }
 
     // Submit post
@@ -196,7 +257,9 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const product_name = document.getElementById('post-name').value;
         const category = document.getElementById('post-category').value;
-        const quantity = document.getElementById('post-quantity').value;
+        const qVal = document.getElementById('post-quantity-value').value;
+        const qUnit = document.getElementById('post-quantity-unit').value;
+        const quantity = qVal ? `${qVal} ${qUnit}` : '';
         const location = document.getElementById('post-location').value;
         const description = document.getElementById('post-desc').value;
         const image_url = document.getElementById('post-image-url').value;
@@ -206,8 +269,11 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang đăng...';
 
         try {
-            const res = await fetch(API_URL_MARKETPLACE, {
-                method: 'POST',
+            const endpoint = editingPostId ? `${API_URL_MARKETPLACE}/${editingPostId}` : API_URL_MARKETPLACE;
+            const method = editingPostId ? 'PUT' : 'POST';
+
+            const res = await fetch(endpoint, {
+                method: method,
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
@@ -216,11 +282,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (res.ok) {
-                alert('Đăng tin thành công!');
+                alert(editingPostId ? 'Cập nhật tin thành công!' : 'Đăng tin thành công!');
                 document.getElementById('postModal').classList.remove('show');
                 document.getElementById('post-form').reset();
-                imagePreview.innerHTML = '';
-                imageUrlInput.value = '';
+                editingPostId = null;
+                document.getElementById('post-modal-title').innerText = user.role === 'merchant' ? 'Đăng tin Cần mua' : 'Đăng tin Cần bán';
+                submitBtn.innerText = user.role === 'merchant' ? 'Đăng tin Mua' : 'Đăng tin Bán';
                 fetchPosts();
             } else {
                 const data = await res.json();
@@ -230,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Lỗi kết nối máy chủ');
         } finally {
             submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Đăng tin';
+            submitBtn.innerHTML = editingPostId ? 'Cập nhật' : (user.role === 'merchant' ? 'Đăng tin Mua' : 'Đăng tin Bán');
         }
     });
 
