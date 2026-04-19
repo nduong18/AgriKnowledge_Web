@@ -170,6 +170,14 @@
                 if(sidebarAvatar && user.avatar) sidebarAvatar.src = user.avatar;
                 
                 if(user.role === 'admin') {
+                    const roleDisplay = document.getElementById('user-role-display');
+                    if (roleDisplay) {
+                        roleDisplay.innerText = 'Quản trị viên';
+                        roleDisplay.className = 'badge';
+                        roleDisplay.style.background = 'var(--red-100)';
+                        roleDisplay.style.color = 'var(--red-700)';
+                    }
+                    
                     const nav = document.querySelector('.dash-nav');
                     if (nav) {
                         const adminLink = document.createElement('a');

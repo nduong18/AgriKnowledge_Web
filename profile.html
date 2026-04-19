@@ -151,6 +151,9 @@
                 window.location.href = 'login.html';
                 return;
             }
+            if (user.role === 'admin') {
+                document.body.classList.add('admin-theme');
+            }
 
             const defaultAvatar = 'https://images.unsplash.com/photo-1599839619722-39751411ea63?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80';
             
