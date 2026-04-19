@@ -1,94 +1,215 @@
 # 🌾 Sổ tay Nông dân số (AgriKnowledge_Web)
 
-Sổ tay Nông dân số là hệ thống bảng điều khiển (Dashboard) thiết kế theo phong cách SaaS hiện đại chuyên cung cấp thông tin, biểu đồ phân tích, diễn biến giá cả các mặt hàng nông sản và nền tảng quản lý chuyên nghiệp cho Nông dân cũng như Quản trị viên (Admin).
+Sổ tay Nông dân số là nền tảng web hỗ trợ nông nghiệp theo mô hình Client - Server, gồm dashboard thông tin, dự báo thời tiết, tin tức nông nghiệp, theo dõi giá nông sản, giao thương (marketplace) và khu vực quản trị.
 
-Dự án sử dụng cơ sở dữ liệu **MySQL**, hoạt động độc lập giữa Client (Frontend) và RESTful API (Backend).
+Dự án sử dụng:
+- Frontend: HTML/CSS/Vanilla JavaScript (không cần build)
+- Backend: Node.js + Express
+- Database: MySQL (tự động tạo database/bảng khi chạy lần đầu)
 
 ## ✨ Tính năng chính
 
-- **Giao diện Dashboard SaaS hiện đại:** Thân thiện, đáp ứng các biểu đồ trực quan (Chart.js), cập nhật dữ liệu liên tục.
-- **Hệ thống Tài khoản & Phân quyền:** Xác thực qua Token (JWT API), tự động phân luồng giao diện:
-  - Tài khoản mặc định (**Nông dân**): Xem các thông số môi trường, thời tiết, lệnh thu mua và biến động giá nông sản. 
-  - Tài khoản **Quản trị (Admin)**: Trang `admin-dashboard.html` quản lý danh sách nông dân, lệnh thu mua. Bảo mật chống truy cập trái phép bằng Local Storage Token Guard.
-- **Phân tích Xu hướng Thị trường:**
-  - Cào dữ liệu gốc (Web Scraping) và chuẩn hóa dữ liệu tự động (Cron-like realtime).
-- **RESTful API Backend & Cơ sở dữ liệu:** Hệ thống API Controller - Routes chịu tải cao, tích hợp CSDL **MySQL** tự động khởi tạo bảng (Auto-Migration) cực kỳ tiện lợi.
+- Xác thực và phân quyền JWT với 3 vai trò: `farmer`, `merchant`, `admin`.
+- Dashboard người dùng:
+  - Xem thời tiết theo khu vực.
+  - Xem biểu đồ giá nông sản (dữ liệu crawl + cache).
+  - Theo dõi thông tin tổng hợp trên giao diện SaaS.
+- Tin tức nông nghiệp:
+  - Người dùng xem danh sách/chi tiết bài viết đã xuất bản.
+  - Admin tạo/sửa/xóa/xuất bản bài viết.
+- Giao thương (Marketplace):
+  - Đăng tin cần bán/cần mua theo vai trò.
+  - Lọc theo loại tin, người đăng, nhóm cây trồng, khu vực.
+  - Hiển thị thời gian + ngày đăng tin.
+  - Nhắn tin trực tiếp giữa các tài khoản.
+- Khu vực quản trị:
+  - Quản lý nông sản theo dõi giá (`products`).
+  - Quản lý tài khoản nông dân.
+  - Quản lý tin đăng giao thương.
 
-## 🛠️ Công nghệ sử dụng
+## 🏗️ Kiến trúc tổng quan
 
-- **Frontend:** HTML5, CSS3, Vanilla JavaScript, thư viện Chart.js.
-- **Backend:** Node.js, Express.js.
-  - **Dependencies:** `mysql2` (Kết nối CSDL), `bcrypt` (Bảo mật Mật khẩu), `jsonwebtoken` (Xác minh đăng nhập/Phiên làm việc), `dotenv` (Biến môi trường), `cheerio` & `axios` (Cào dữ liệu thị trường), `cors`.
+```text
+Frontend (HTML/CSS/JS) <-> REST API (Express) <-> MySQL
+                           |
+                           +-> Scraping giá nông sản (Axios + Cheerio)
+```
 
-## 📂 Cấu trúc dự án
+- Frontend được phục vụ trực tiếp bởi `express.static(...)` từ `backend/server.js`.
+- Backend tự động khởi tạo DB và các bảng trong `backend/config/db.js`.
+
+## 📂 Cấu trúc thư mục
 
 ```text
 AgriKnowledge_Web/
-├── backend/                  # REST API Backend
-│   ├── config/db.js          # Kết nối MySQL & Auto-migrate database
-│   ├── controllers/          # Nhận và xử lý yêu cầu phản hồi HTTP (Auth, Prices)
-│   ├── routes/               # Quản lý đường dẫn (authRoutes, priceRoutes)
-│   ├── services/             # Logic nghiệp vụ, cào dữ liệu (Cheerio)
-│   ├── utils/                # Hàm định dạng bổ trợ
-│   ├── server.js             # Máy chủ khởi chạy Backend
-│   ├── .env                  # Cấu hình Database & Security Keys
-│   └── package.json
-├── css/                      # Stylesheet (CSS)
-├── js/                       # JS Logic (auth.js, script.js)
-├── index.html                # Trang Landing Page
-├── login.html                # Trang Đăng nhập
-├── register.html             # Trang Đăng ký
-├── dashboard.html            # Trang Bảng điều khiển Hệ thống dành cho Nông dân
-└── admin-dashboard.html      # Trang Quản trị thông số toàn cục dành cho Admin
+|- backend/
+|  |- config/
+|  |  |- db.js
+|  |- controllers/
+|  |- middleware/
+|  |- routes/
+|  |  |- authRoutes.js
+|  |  |- adminRoutes.js
+|  |  |- priceRoutes.js
+|  |  |- newsRoutes.js
+|  |  |- marketplaceRoutes.js
+|  |  |- messageRoutes.js
+|  |- services/
+|  |  |- priceService.js
+|  |- utils/
+|  |  |- priceParser.js
+|  |- server.js
+|  |- package.json
+|  |- .env
+|- css/
+|- js/
+|  |- auth.js
+|  |- script.js
+|  |- weather.js
+|  |- marketplace.js
+|- index.html
+|- login.html
+|- register.html
+|- dashboard.html
+|- weather.html
+|- news.html
+|- news-detail.html
+|- marketplace.html
+|- profile.html
+|- admin-products.html
+|- admin-farmers.html
+|- admin-news.html
+|- admin-marketplace.html
+|- README.md
 ```
 
-## 🚀 Hướng dẫn Cài đặt & Sử dụng
+## ⚙️ Yêu cầu hệ thống
 
-### 1. Yêu cầu hệ thống
-- [Node.js](https://nodejs.org/) (khuyến nghị phiên bản 16.x trở lên).
-- **MySQL Server**: Khởi chạy qua XAMPP, WAMP, Docker hoặc App MySQL riêng lẻ trên Window.
+- Node.js 16+ (khuyến nghị Node.js 18+)
+- MySQL 8.x (hoặc MySQL từ XAMPP/WAMP)
 
-### 2. Cài đặt CSDL và Backend API
-Chạy máy chủ Backend để ứng dụng kết nối dữ liệu. Bạn phải cấu hình kết nối DB trước tiên:
+## 🚀 Cài đặt và chạy dự án
 
-1. Di chuyển tới thư mục backend và cài đặt thư viện
+1) Cài dependencies backend
+
 ```bash
 cd backend
 npm install
 ```
 
-2. Kiểm tra nội dung file `backend/.env` (Nếu cài mật khẩu root MySQL cho Database, hãy sửa thông số ở lệnh: `DB_PASSWORD` tương ứng, mặc định để trống nếu đang dùng XAMPP gốc).
+2) Tạo/cập nhật file `backend/.env`
+
 ```env
 DB_HOST=localhost
 DB_USER=root
-DB_PASSWORD=
+DB_PASSWORD=your_password
 DB_NAME=agriknowledge
 DB_PORT=3306
-JWT_SECRET=supersecretkey_agriknowledge_2026
+JWT_SECRET=replace_with_a_strong_secret
 PORT=3000
 ```
 
-3. Khởi chạy mã nguồn backend:
+3) Chạy server
+
 ```bash
 node server.js
 ```
-*Lưu ý: Hệ thống sẽ **tự động** khởi tạo CSDL `agriknowledge` và các Table (bảng người dùng) tại lần chạy đầu tiên. Bạn không cần tự viết lệnh tạo script SQL thủ công.* Console sẽ báo `✅ Cơ sở dữ liệu MySQL và bảng users đã sẵn sàng.`
 
-### 3. Khởi tạo tài khoản và Quản trị Web
-Frontend được thiết kế gọn nhẹ không qua build. Bạn chỉ cần click đúp vào các file `.html` hoặc khởi chạy qua **Live Server** (VSC) để tương tác:
+4) Mở ứng dụng
 
-- Bấm nút **Đăng ký** trang `register.html` hoặc tại website. Bất kỳ tài khoản mới nào tự tạo đều được giới hạn ở phân quyền **Nông dân**.
-- Để cấp tài khoản **Admin** cho quản trị viên, dùng Postman hoặc Thunder Client REST API gửi một Request HTTP Method **POST** vào endpoint tự tạo Admin:
-  - **URL:** `http://localhost:3000/api/auth/create-admin`
-  - **Body (JSON):** 
-    ```json
-    {
-      "email": "admin1@agri.com",
-      "password": "123"
-    }
-    ```
+- Truy cập: `http://localhost:3000/index.html`
+- Hoặc các trang khác: `http://localhost:3000/login.html`, `http://localhost:3000/marketplace.html`, ...
 
-Đăng nhập bằng các tài khoản tương ứng, hệ thống sẽ bảo mật và tự điều hướng chuẩn xác đến bảng phân quyền Admin hoặc Người dùng mà ta đã thiết lập! Cảm ơn bạn.
+Lưu ý:
+- Backend sẽ tự động tạo database và các bảng nếu chưa tồn tại.
+- Không cần build frontend.
 
-## 📝 Giấy phép
-Dự án mở tuỳ biến. Nghiêm cấm sử dụng vào mục đích thương mại trái quy định gốc.
+## 👥 Tài khoản và phân quyền
+
+- Đăng ký từ giao diện `register.html`: tạo tài khoản `farmer` hoặc `merchant`.
+- Tạo admin bằng API (nếu cần):
+
+```http
+POST /api/auth/create-admin
+Content-Type: application/json
+
+{
+  "email": "admin1@agri.com",
+  "password": "123456",
+  "display_name": "Quản trị viên"
+}
+```
+
+## 🔌 API chính
+
+### Auth
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `POST /api/auth/create-admin`
+- `PUT /api/auth/profile` (Bearer token)
+
+### Prices
+- `GET /api/prices`
+
+### News
+- Public:
+  - `GET /api/news`
+  - `GET /api/news/:id`
+- Admin:
+  - `GET /api/news/admin/list`
+  - `GET /api/news/admin/:id`
+  - `POST /api/news`
+  - `PUT /api/news/:id`
+  - `DELETE /api/news/:id`
+
+### Marketplace
+- `GET /api/marketplace`
+- `POST /api/marketplace` (Bearer token)
+- `PUT /api/marketplace/:id` (Bearer token)
+- `DELETE /api/marketplace/:id` (Bearer token)
+- `PUT /api/marketplace/:id/verify` (Admin)
+
+### Messages
+- `GET /api/messages/conversations` (Bearer token)
+- `GET /api/messages/unread-count` (Bearer token)
+- `GET /api/messages/:partnerId` (Bearer token)
+- `POST /api/messages` (Bearer token)
+
+### Admin
+- `GET /api/admin/dashboard`
+- `GET /api/admin/products`
+- `POST /api/admin/products`
+- `PUT /api/admin/products/:id`
+- `DELETE /api/admin/products/:id`
+- `GET /api/admin/farmers`
+- `POST /api/admin/farmers`
+- `PUT /api/admin/farmers/:id`
+- `DELETE /api/admin/farmers/:id`
+
+## 🗄️ Database được tạo tự động
+
+Khi server khởi động, hệ thống tự động tạo/cập nhật các bảng:
+- `users`
+- `products`
+- `news`
+- `marketplace_posts`
+- `messages`
+
+## 🔐 Bảo mật và vận hành
+
+- Mật khẩu được băm bằng `bcrypt`.
+- Xác thực API bằng `JWT` trong header `Authorization: Bearer <token>`.
+- Khuyến nghị:
+  - Không commit `backend/.env`.
+  - Đặt `JWT_SECRET` mạnh.
+  - Sử dụng mật khẩu DB riêng cho mỗi môi trường.
+
+## 🧪 Ghi chú phát triển
+
+- Dữ liệu giá nông sản được crawl và cache 15 phút để tránh gọi nguồn quá nhiều.
+- Frontend hiện tại là Vanilla JS, phù hợp cho triển khai nhanh và dễ bảo trì.
+- Chưa có bộ test tự động (script `npm test` hiện đang là placeholder).
+
+## 📝 License
+
+Dự án được chia sẻ cho mục đích học tập và phát triển nội bộ. Hãy bổ sung giấy phép cụ thể (MIT/Apache-2.0/Proprietary) nếu bạn triển khai công khai.
