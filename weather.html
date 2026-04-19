@@ -436,6 +436,16 @@
             if(user) {
                 if(nameDisplay) nameDisplay.innerText = user.display_name || (user.email ? user.email.split('@')[0] : 'Người dùng');
                 if(sidebarAvatar && user.avatar) sidebarAvatar.src = user.avatar;
+                
+                if(user.role === 'admin') {
+                    const nav = document.querySelector('.dash-nav');
+                    if (nav) {
+                        const adminLink = document.createElement('a');
+                        adminLink.href = 'admin-dashboard.html';
+                        adminLink.innerHTML = '<i class="fa-solid fa-user-tie"></i> <span>Vào trang quản trị</span>';
+                        nav.appendChild(adminLink);
+                    }
+                }
             }
 
             const logoutBtn = document.getElementById('logout-btn');

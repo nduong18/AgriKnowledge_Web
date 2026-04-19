@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
     <style>
@@ -66,6 +68,7 @@
                     <a href="#"><i class="fa-solid fa-signs-post"></i> <span>Quản lý Báo cáo</span></a>
                     <a href="#"><i class="fa-solid fa-gear"></i> <span>Cài đặt hệ thống</span></a>
                     <a href="profile.html"><i class="fa-solid fa-user"></i> <span>Hồ sơ cá nhân</span></a>
+                    <a href="dashboard.html"><i class="fa-solid fa-house-user"></i> <span>Trang chủ Nông dân</span></a>
                 </nav>
                 <div style="margin-top: auto; padding: 20px 12px;">
                     <a href="index.html" id="logout-btn" style="color: var(--red-500); text-decoration: none; display: flex; align-items: center; gap: 12px; padding: 10px 16px; font-weight: 500;"><i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="logout-text">Đăng xuất</span></a>
@@ -89,14 +92,19 @@
             
             <!-- Products table -->
             <div class="widget" style="margin-top: 24px;">
-                <div class="widget-head" style="margin-bottom: 15px;">
+                <div class="widget-head" style="margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
                     <h4>Danh sách Nông sản đang theo dõi</h4>
-                    <button class="btn btn-sm btn-outline-emerald" onclick="loadProducts()"><i class="fa-solid fa-rotate-right"></i> Làm mới</button>
+                    <div style="display:flex; gap: 10px; align-items:center;">
+                        <input type="text" id="searchInput" onkeyup="filterTable()" class="form-control" placeholder="Tìm tên hoặc ký hiệu..." style="padding: 6px 12px; font-size: 0.85rem; width: 220px; border-radius: 6px;">
+                        <button id="compareBtn" class="btn btn-sm btn-primary" style="display:none;" onclick="compareSelectedCharts()"><i class="fa-solid fa-chart-line"></i> So sánh</button>
+                        <button class="btn btn-sm btn-outline-emerald" onclick="loadProducts()" title="Tải lại bảng"><i class="fa-solid fa-rotate-right"></i></button>
+                    </div>
                 </div>
                 <div style="overflow-x: auto;">
                     <table style="width: 100%; border-collapse: collapse; text-align: left;">
                         <thead>
                             <tr style="border-bottom: 1px solid var(--slate-200); color: var(--slate-500); background: var(--slate-50);">
+                                <th style="padding: 12px 10px; font-weight: 600; width: 40px;"><input type="checkbox" id="selectAll" onclick="toggleAllCheckboxes(this)"></th>
                                 <th style="padding: 12px 10px; font-weight: 600;">ID</th>
                                 <th style="padding: 12px 10px; font-weight: 600;">Ký hiệu</th>
                                 <th style="padding: 12px 10px; font-weight: 600;">Tên Nông sản</th>
@@ -107,12 +115,25 @@
                             </tr>
                         </thead>
                         <tbody id="product-list-table">
-                            <tr><td colspan="7" style="text-align:center; padding: 20px;">Đang tải dữ liệu...</td></tr>
+                            <tr><td colspan="8" style="text-align:center; padding: 20px;">Đang tải dữ liệu...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Chart Modal -->
+    <div class="modal" id="chartModal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header" style="margin-bottom: 10px;">
+                <h3 id="chartModalTitle">Biểu đồ Biến động Giá</h3>
+                <button class="close-btn" onclick="closeChartModal()">&times;</button>
+            </div>
+            <div style="height: 350px; width: 100%; position: relative;">
+                <canvas id="priceChartCanvas"></canvas>
+            </div>
+        </div>
     </div>
 
     <!-- Modal Form -->
@@ -157,6 +178,8 @@
     <script>
         let modalMode = 'add';
         const token = localStorage.getItem('token');
+        let globalPricesData = {};
+        let currentChart = null;
         
         document.addEventListener('DOMContentLoaded', () => {
             const user = JSON.parse(localStorage.getItem('user'));
@@ -171,6 +194,7 @@
                 if(sidebarAvatar && user.avatar) sidebarAvatar.src = user.avatar;
                 
                 loadProducts();
+                loadPricesCache();
             }
             
             document.getElementById('logout-btn').addEventListener('click', (e) => {
@@ -184,6 +208,17 @@
             document.getElementById('productForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 window.saveProduct();
+            });
+
+            // Auto-sync bg_color with color
+            document.getElementById('color').addEventListener('input', (e) => {
+                const hex = e.target.value;
+                if(/^#([A-Fa-f0-9]{6})$/.test(hex)){
+                    const r = parseInt(hex.substring(1,3), 16);
+                    const g = parseInt(hex.substring(3,5), 16);
+                    const b = parseInt(hex.substring(5,7), 16);
+                    document.getElementById('bg_color').value = `rgba(${r}, ${g}, ${b}, 0.1)`;
+                }
             });
 
             // Sidebar Toggle
@@ -200,6 +235,17 @@
             }
         });
 
+        async function loadPricesCache() {
+            try {
+                const res = await fetch('http://localhost:3000/api/prices');
+                if (res.ok) {
+                    globalPricesData = await res.json();
+                }
+            } catch (err) {
+                console.error('Không tải được cache dữ liệu giá nông sản:', err);
+            }
+        }
+
         async function loadProducts() {
             const tbody = document.getElementById('product-list-table');
             try {
@@ -210,14 +256,16 @@
                     const data = await response.json();
                     tbody.innerHTML = '';
                     if(data.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px;">Hệ thống chưa có Nông sản nào.</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 20px;">Hệ thống chưa có Nông sản nào.</td></tr>`;
                         return;
                     }
                     data.forEach(item => {
                         tbody.innerHTML += `
-                            <tr style="border-bottom: 1px solid var(--slate-100); transition: background 0.2s; cursor: default;" onmouseover="this.style.background='var(--slate-50)'" onmouseout="this.style.background='transparent'">
+                            <tr class="product-row" style="border-bottom: 1px solid var(--slate-100); transition: background 0.2s; cursor: default;" onmouseover="this.style.background='var(--slate-50)'" onmouseout="this.style.background='transparent'">
+                                <td style="padding: 12px 10px;"><input type="checkbox" class="compare-cb" value="${item.key_name}" onclick="handleCheckboxSelect()"></td>
                                 <td style="padding: 12px 10px;">#${item.id}</td>
-                                <td style="padding: 12px 10px; font-weight: 600; color: ${item.color};">${item.key_name}</td>
+                                <td style="padding: 12px 10px; font-weight: 600; color: ${item.color};" class="product-key">${item.key_name}</td>
+                                <td style="padding: 12px 10px; font-weight: 500;" class="product-name">${item.name}</td>                              <td style="padding: 12px 10px; font-weight: 600; color: ${item.color};">${item.key_name}</td>
                                 <td style="padding: 12px 10px; font-weight: 500;">${item.name}</td>
                                 <td style="padding: 12px 10px;">
                                     <div style="display:flex; align-items:center; gap: 8px;">
@@ -232,12 +280,17 @@
                                     </a>
                                 </td>
                                 <td style="padding: 12px 10px; text-align: center;">
+                                    <button class="btn btn-sm btn-icon" style="color:var(--emerald-600); margin-right: 8px;" onclick="viewChart('${item.key_name}')" title="Xem biểu đồ giá"><i class="fa-solid fa-chart-simple"></i></button>
                                     <button class="btn btn-sm btn-icon" style="color:var(--blue-500); margin-right: 8px;" onclick="openModal('edit', ${item.id}, '${item.key_name}', '${item.name}', '${item.color}', '${item.bg_color || ''}', '${item.url || ''}')" title="Sửa thông tin"><i class="fa-solid fa-pen"></i></button>
                                     <button class="btn btn-sm btn-icon" style="color:var(--red-500);" onclick="deleteProduct(${item.id})" title="Xóa Nông sản"><i class="fa-solid fa-trash"></i></button>
                                 </td>
                             </tr>
                         `;
                     });
+                    
+                    // Reset trạng thái checkbox
+                    document.getElementById('selectAll').checked = false;
+                    handleCheckboxSelect();
                 } else if(response.status === 401 || response.status === 403) {
                     alert('Hết hạn đăng nhập');
                     window.location.href = 'login.html';
@@ -306,6 +359,7 @@
                     alert(result.message);
                     closeModal();
                     loadProducts();
+                    loadPricesCache();
                 } else {
                     alert(result.error || 'Đã có lỗi xảy ra');
                 }
@@ -328,12 +382,154 @@
                     if (res.ok) {
                         alert(result.message);
                         loadProducts();
+                        loadPricesCache();
                     } else {
                         alert(result.error || 'Lỗi khi xóa!');
                     }
                 } catch(err) {
                     alert('Lỗi kết nối máy chủ!');
                 }
+            }
+        }
+
+        // Logic Lọc, So sánh và Vẽ Biểu đồ
+        function toggleAllCheckboxes(source) {
+            const checkboxes = document.querySelectorAll('.compare-cb');
+            checkboxes.forEach(cb => cb.checked = source.checked);
+            handleCheckboxSelect();
+        }
+
+        function handleCheckboxSelect() {
+            const checkboxes = document.querySelectorAll('.compare-cb:checked');
+            const btn = document.getElementById('compareBtn');
+            if (checkboxes.length >= 2) {
+                btn.style.display = 'inline-block';
+            } else {
+                btn.style.display = 'none';
+            }
+        }
+
+        function filterTable() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const rows = document.querySelectorAll('.product-row');
+            
+            rows.forEach(row => {
+                const key = row.querySelector('.product-key')?.innerText.toLowerCase() || '';
+                const name = row.querySelector('.product-name')?.innerText.toLowerCase() || '';
+                if (key.includes(filter) || name.includes(filter)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function openChartModal(title) {
+            document.getElementById('chartModalTitle').innerText = title;
+            document.getElementById('chartModal').classList.add('active');
+        }
+
+        function closeChartModal() {
+            document.getElementById('chartModal').classList.remove('active');
+            if (currentChart) {
+                currentChart.destroy();
+                currentChart = null;
+            }
+        }
+
+        function renderChart(datasets, labels) {
+            const ctx = document.getElementById('priceChartCanvas');
+            if (currentChart) {
+                currentChart.destroy();
+            }
+            
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            currentChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: datasets.length > 1 },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            padding: 12,
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 14, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false, drawBorder: false } },
+                        y: { 
+                            display: true, 
+                            grid: { color: '#f1f5f9', drawBorder: false },
+                            ticks: { font: { size: 11 }, color: '#94a3b8' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function viewChart(key_name) {
+            const data = globalPricesData[key_name];
+            if (!data || !data.data) {
+                alert('Chưa tải được dữ liệu giá từ Crawler. Hãy đợi một chút hoặc kiểm tra lại đường dẫn thu thập.');
+                return;
+            }
+            openChartModal(`Biểu đồ: ${data.label}`);
+            renderChart([{
+                label: data.label,
+                data: data.data,
+                borderColor: data.color,
+                backgroundColor: data.bg,
+                borderWidth: 3,
+                pointBackgroundColor: 'white',
+                pointBorderColor: data.color,
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                fill: true,
+                tension: 0.4
+            }], data.dates || ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']);
+        }
+
+        function compareSelectedCharts() {
+            const checkboxes = document.querySelectorAll('.compare-cb:checked');
+            if (checkboxes.length < 2) return;
+            
+            let datasets = [];
+            let commonLabels = null;
+            
+            checkboxes.forEach(cb => {
+                const key = cb.value;
+                const data = globalPricesData[key];
+                if (data && data.data) {
+                    if (!commonLabels) commonLabels = data.dates;
+                    datasets.push({
+                        label: data.label,
+                        data: data.data,
+                        borderColor: data.color,
+                        backgroundColor: 'transparent',
+                        borderWidth: 3,
+                        pointBackgroundColor: 'white',
+                        pointBorderColor: data.color,
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        fill: false,
+                        tension: 0.4
+                    });
+                }
+            });
+            
+            if (datasets.length > 0) {
+                openChartModal(`So sánh giá ${datasets.length} Nông sản`);
+                renderChart(datasets, commonLabels || ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']);
+            } else {
+                alert('Dữ liệu trống!');
             }
         }
     </script>
