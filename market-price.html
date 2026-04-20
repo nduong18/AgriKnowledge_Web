@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thị trường & Giá - Sổ tay Nông dân số</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .market-price-content {
+            padding: 24px;
+            height: calc(100vh - 85px);
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+            grid-template-areas:
+                "controls controls"
+                "chart overview";
+            gap: 20px;
+        }
+
+        .market-controls {
+            grid-area: controls;
+            display: grid;
+            grid-template-columns: minmax(260px, 520px) minmax(0, 1fr);
+            align-items: end;
+            gap: 14px;
+        }
+
+        .market-controls .control-group {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
+        .market-pickers {
+            width: 100%;
+            display: grid;
+            grid-template-columns: minmax(220px, 1fr) minmax(220px, 1fr);
+            gap: 10px;
+        }
+
+        .market-picker-item {
+            width: 100%;
+        }
+
+        .market-search-wrap {
+            position: relative;
+            width: 100%;
+        }
+
+        #market-product-select {
+            width: 100%;
+        }
+
+        #market-product-search {
+            width: 100%;
+        }
+
+        .market-search-suggestions {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1px solid var(--slate-200);
+            border-radius: 10px;
+            box-shadow: var(--shadow-md);
+            max-height: 220px;
+            overflow-y: auto;
+            z-index: 25;
+            display: none;
+        }
+
+        .market-search-item {
+            width: 100%;
+            text-align: left;
+            border: 0;
+            background: transparent;
+            padding: 10px 12px;
+            color: var(--slate-700);
+            font-size: 0.92rem;
+            cursor: pointer;
+        }
+
+        .market-search-item:hover,
+        .market-search-item.active {
+            background: var(--emerald-50);
+            color: var(--emerald-700);
+        }
+
+        .market-controls-right {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .market-updated-chip {
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: var(--slate-100);
+            color: var(--slate-600);
+            font-size: 0.83rem;
+            font-weight: 500;
+            border: 1px solid var(--slate-200);
+            white-space: nowrap;
+        }
+
+        .market-controls label {
+            font-size: 0.85rem;
+            color: var(--slate-600);
+            margin-bottom: 6px;
+            display: inline-block;
+        }
+
+        .market-chart-widget {
+            grid-area: chart;
+        }
+
+        .market-overview-widget {
+            grid-area: overview;
+        }
+
+        .market-chart-wrap {
+            height: 420px;
+            position: relative;
+        }
+
+        .market-chart-note {
+            margin-top: 10px;
+            color: var(--slate-500);
+            font-size: 0.82rem;
+        }
+
+        #product-price-cards {
+            display: grid;
+            gap: 10px;
+            margin-top: 4px;
+            max-height: 425px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .product-price-card {
+            border: 1px solid var(--slate-200);
+            border-radius: 12px;
+            padding: 12px;
+            background: #fff;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .product-price-card:hover {
+            border-color: var(--emerald-300);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .product-price-card.active {
+            border-color: var(--emerald-500);
+            background: linear-gradient(180deg, #ffffff 0%, var(--emerald-50) 100%);
+        }
+
+        .pp-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pp-name {
+            font-size: 0.93rem;
+            font-weight: 600;
+            color: var(--slate-800);
+            line-height: 1.3;
+        }
+
+        .pp-price {
+            margin-top: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--slate-900);
+        }
+
+        .pp-trend {
+            font-size: 0.78rem;
+            font-weight: 600;
+            border-radius: 99px;
+            padding: 4px 8px;
+            white-space: nowrap;
+        }
+
+        .pp-trend.up {
+            color: var(--emerald-700);
+            background: var(--emerald-100);
+        }
+
+        .pp-trend.down {
+            color: var(--red-500);
+            background: var(--red-100);
+        }
+
+        .pp-trend.flat {
+            color: var(--slate-600);
+            background: var(--slate-100);
+        }
+
+        @media (max-width: 1100px) {
+            .market-price-content {
+                grid-template-columns: 1fr;
+                grid-template-areas:
+                    "controls"
+                    "chart"
+                    "overview";
+            }
+
+            .market-chart-wrap {
+                height: 360px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .market-price-content {
+                padding: 16px;
+                height: auto;
+            }
+
+            .market-controls .control-group {
+                min-width: 100%;
+            }
+
+            .market-pickers {
+                grid-template-columns: 1fr;
+            }
+
+            .market-controls-right {
+                justify-content: flex-start;
+            }
+
+            .market-chart-wrap {
+                height: 300px;
+            }
+
+            #product-price-cards {
+                max-height: none;
+            }
+        }
+    </style>
+</head>
+<body class="dashboard-page">
+    <div class="saas-dashboard">
+        <aside class="dash-sidebar">
+            <button id="sidebarToggleBtn" class="floating-toggle-btn"><i class="fa-solid fa-angle-left" id="toggleIcon"></i></button>
+            <div class="sidebar-content-wrapper">
+                <div class="dash-profile">
+                    <img id="sidebar-avatar" src="https://images.unsplash.com/photo-1599839619722-39751411ea63?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Avatar">
+                    <div class="dash-profile-info">
+                        <strong id="user-name-display">Người dùng</strong>
+                        <span class="badge badge-farmer" id="user-role-display">Nông dân</span>
+                    </div>
+                </div>
+                <nav class="dash-nav">
+                    <a href="dashboard.html"><i class="fa-solid fa-house"></i> <span>Tổng quan</span></a>
+                    <a href="weather.html"><i class="fa-solid fa-cloud-sun-rain"></i> <span>Thời tiết & Môi trường</span></a>
+                    <a href="#"><i class="fa-solid fa-seedling"></i> <span>Nhật ký canh tác</span></a>
+                    <a href="market-price.html" class="active"><i class="fa-solid fa-chart-line"></i> <span>Thị trường & Giá</span></a>
+                    <a href="news.html"><i class="fa-regular fa-newspaper"></i> <span>Tin tức Nông nghiệp</span></a>
+                    <a href="marketplace.html"><i class="fa-solid fa-handshake"></i> <span>Giao thương</span></a>
+                    <a href="#"><i class="fa-solid fa-book"></i> <span>Cẩm nang Kỹ thuật</span></a>
+                    <a href="profile.html"><i class="fa-solid fa-user"></i> <span>Hồ sơ cá nhân</span></a>
+                </nav>
+                <div style="margin-top: auto; padding: 20px 12px;">
+                    <a href="index.html" id="logout-btn" style="color: var(--red-500); text-decoration: none; display: flex; align-items: center; gap: 12px; padding: 10px 16px; font-weight: 500;"><i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="logout-text">Đăng xuất</span></a>
+                </div>
+            </div>
+        </aside>
+
+        <main class="dash-main">
+            <header class="dash-topbar">
+                <div class="page-title">
+                    <h3>Thị trường & Giá nông sản</h3>
+                    <p>Theo dõi biến động giá các mặt hàng nông sản theo thời gian thực</p>
+                </div>
+                <div class="dash-controls">
+                    <a href="dashboard.html" class="btn btn-outline-emerald btn-sm"><i class="fa-solid fa-arrow-left"></i> Về bảng tổng quan</a>
+                </div>
+            </header>
+
+            <section class="market-price-content">
+                <div class="widget market-controls">
+                    <div class="control-group">
+                        <label for="market-product-select"><i class="fa-solid fa-seedling"></i> Chọn hoặc tìm nông sản</label>
+                        <div class="market-pickers">
+                            <div class="market-picker-item">
+                                <select id="market-product-select" class="dash-select"></select>
+                            </div>
+                            <div class="market-picker-item">
+                                <div class="market-search-wrap">
+                                    <input type="text" id="market-product-search" class="form-control" placeholder="Nhập tên nông sản để tìm...">
+                                    <div id="market-search-suggestions" class="market-search-suggestions"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="market-controls-right">
+                        <div id="market-last-updated" class="market-updated-chip">Đang cập nhật dữ liệu...</div>
+                    </div>
+                </div>
+
+                <div class="widget market-chart-widget">
+                    <div class="widget-head">
+                        <h4><i class="fa-solid fa-chart-line text-blue"></i> Biểu đồ giá</h4>
+                    </div>
+                    <div class="market-chart-wrap">
+                        <canvas id="marketPriceChart"></canvas>
+                    </div>
+                    <div class="market-chart-note">Dữ liệu được đồng bộ từ API giá nông sản của hệ thống.</div>
+                </div>
+
+                <div class="widget market-overview-widget">
+                    <div class="widget-head">
+                        <h4><i class="fa-solid fa-list-check text-emerald"></i> Tổng quan các nông sản</h4>
+                    </div>
+                    <div id="product-price-cards"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/market-price.js"></script>
+</body>
+</html>

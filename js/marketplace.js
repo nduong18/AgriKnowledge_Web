@@ -58,6 +58,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    if (user.role === 'admin') {
+        document.body.classList.add('admin-theme');
+        const nav = document.querySelector('.dash-nav');
+        if (nav && !nav.querySelector('a[href="admin-products.html"]')) {
+            const adminLink = document.createElement('a');
+            adminLink.href = 'admin-products.html';
+            adminLink.innerHTML = '<i class="fa-solid fa-user-tie"></i> <span>Vào trang quản trị</span>';
+            nav.appendChild(adminLink);
+        }
+    }
+
     // Modal elements
     const postModal = document.getElementById('postModal');
     const chatModal = document.getElementById('chatModal');
