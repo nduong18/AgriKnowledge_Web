@@ -183,6 +183,9 @@
 
             // Handle Sidebar Navigation Dynamically
             const sidebarNav = document.querySelector('.dash-nav');
+            const currentPage = window.location.pathname.split('/').pop() || 'profile.html';
+            const isAdminContextPage = currentPage.startsWith('admin-') || currentPage === 'profile.html';
+            const adminEntryLink = '<a href="admin-products.html"><i class="fa-solid fa-user-tie"></i> <span>Vào trang quản trị</span></a>';
             if (sidebarNav) {
                 if (user.role === 'admin') {
                     sidebarNav.innerHTML = `
@@ -193,7 +196,7 @@
                         <a href="#"><i class="fa-solid fa-signs-post"></i> <span>Quản lý Báo cáo</span></a>
                         <a href="#"><i class="fa-solid fa-gear"></i> <span>Cài đặt hệ thống</span></a>
                         <a href="profile.html" class="active"><i class="fa-solid fa-user"></i> <span>Hồ sơ cá nhân</span></a>
-                        <a href="admin-products.html"><i class="fa-solid fa-user-tie"></i> <span>Vào trang quản trị</span></a>
+                        ${isAdminContextPage ? '' : adminEntryLink}
                         <a href="dashboard.html"><i class="fa-solid fa-house-user"></i> <span>Trang chủ Nông dân</span></a>
                     `;
                 } else {

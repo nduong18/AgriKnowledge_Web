@@ -64,65 +64,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if(heroUI) heroUI.textContent = `${temp}°C - ${status}`;
 
-            // Update AI Feed conditionally
-            updateAIFeed(locationName, temp, code);
-
         } catch(e) {
             console.error(e);
             if(descUI) descUI.textContent = "Mất kết nối máy chủ dữ liệu";
             if(heroUI) heroUI.textContent = "Offline";
         }
-    };
-
-    // Simulated AI Recommendation Engine Logic
-    const updateAIFeed = (location, temp, weathercode) => {
-        const feedContainer = document.getElementById('dash-ai-feed');
-        if(!feedContainer) return;
-
-        let html = '';
-        if (weathercode > 50) {
-            html = `
-                <li class="feed-item warning">
-                    <div class="feed-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                    <div class="feed-content">
-                        <strong>Cảnh báo Dịch Mốc sương (${location})</strong>
-                        <p>Độ ẩm dư thừa liên tục do mưa. Khuyến nghị phun phòng ngừa xịt thuốc gốc Đồng hoặc Mancozeb.</p>
-                    </div>
-                </li>
-            `;
-        } else if (temp > 35) {
-            html = `
-                <li class="feed-item warning">
-                    <div class="feed-icon"><i class="fa-solid fa-temperature-arrow-up text-red-500"></i></div>
-                    <div class="feed-content">
-                        <strong>Nắng Nóng Cục Bộ (${location})</strong>
-                        <p>Nhiệt độ ${temp}°C cao bất thường. Đề nghị tăng lưu lượng tưới nhỏ giọt, phủ rơm giữ ẩm gốc.</p>
-                    </div>
-                </li>
-            `;
-        } else {
-            html = `
-                <li class="feed-item" style="border-color: var(--emerald-500)">
-                    <div class="feed-icon text-emerald"><i class="fa-solid fa-check-circle"></i></div>
-                    <div class="feed-content">
-                        <strong>Điều kiện tiêu chuẩn (${location})</strong>
-                        <p>Thời tiết ôn hòa. Rất phù hợp để bón phân thúc đợt 2 cho vùng đất gò cao.</p>
-                    </div>
-                </li>
-            `;
-        }
-        
-        // Add static knowledge snippet
-        html += `
-            <li class="feed-item" style="border-color: var(--blue-500)">
-                <div class="feed-icon text-blue"><i class="fa-solid fa-lightbulb"></i></div>
-                <div class="feed-content">
-                    <strong>Nghiệp vụ thị trường</strong>
-                    <p>Khối lượng giao dịch qua sàn "Nông Dân Số" tuần qua tăng trưởng ổn định. Nên cân nhắc ký HĐ bao tiêu trước.</p>
-                </div>
-            </li>
-        `;
-        feedContainer.innerHTML = html;
     };
 
     // Initial Load
