@@ -1,535 +1,282 @@
-# AgriKnowledge Web - Sổ Tay Nông Dân Số
+# BÁO CÁO BÀI TẬP LỚN: HỆ SINH THÁI NÔNG NGHIỆP SỔ TAY NÔNG DÂN SỐ (AGRIKNOWLEDGE WEB)
 
-AgriKnowledge Web là ứng dụng web hỗ trợ nông nghiệp theo mô hình client-server. Dự án cung cấp dashboard thông tin, thời tiết, giá nông sản, tin tức, marketplace mua bán nông sản, nhắn tin và khu vực quản trị.
+## 1. Giới thiệu Đề tài
+**AgriKnowledge Web (Sổ Tay Nông Dân Số)** là một ứng dụng Web (SaaS) được xây dựng nhằm hỗ trợ cộng đồng nông dân và thương lái trong việc theo dõi thời tiết tự động theo vùng canh tác, cập nhật biến động giá nông sản theo thời gian thực (crawler), đọc tin tức chuyên ngành, và đặc biệt là hệ thống Giao thương (Marketplace) cho phép đăng tin mua bán, kết nối và nhắn tin trực tiếp.
 
-Frontend dùng HTML/CSS/Vanilla JavaScript và được phục vụ như static files. Backend dùng Node.js + Express, kết nối MySQL và cung cấp REST API.
+Ứng dụng được thiết kế theo mô hình **Client - Server**, chia quyền rõ ràng giữa Người dùng (Nông dân/Thương lái) và Quản trị viên (Admin).
 
-## Mục Lục
+---
 
-- [Tính năng](#tính-năng)
-- [Kiến trúc](#kiến-trúc)
-- [Cấu trúc thư mục](#cấu-trúc-thư-mục)
-- [Yêu cầu môi trường](#yêu-cầu-môi-trường)
-- [Cài đặt và chạy dự án](#cài-đặt-và-chạy-dự-án)
-- [Cấu hình môi trường](#cấu-hình-môi-trường)
-- [Tài khoản và phân quyền](#tài-khoản-và-phân-quyền)
-- [API](#api)
-- [Database](#database)
-- [Quy tắc phát triển](#quy-tắc-phát-triển)
-- [Troubleshooting](#troubleshooting)
-
-## Tính Năng
-
-### Người dùng
-
-- Đăng ký tài khoản nông dân hoặc thương lái.
-- Đăng nhập bằng email và mật khẩu.
-- Cập nhật hồ sơ cá nhân, tên hiển thị, ảnh đại diện và mật khẩu.
-- Xem dashboard tổng quan.
-- Xem thời tiết theo khu vực.
-- Xem biểu đồ giá nông sản.
-- Đọc danh sách tin tức và chi tiết bài viết.
-- Xem marketplace, lọc tin mua/bán, nhắn tin với người đăng.
-
-### Thương lái
-
-- Đăng tin cần mua nông sản.
-- Quản lý tin đã đăng.
-- Nhắn tin trực tiếp với người bán.
-
-### Nông dân
-
-- Đăng tin cần bán nông sản.
-- Quản lý tin đã đăng.
-- Nhắn tin trực tiếp với người mua.
-
-### Admin
-
-- Quản lý danh sách nông sản theo dõi giá.
-- Quản lý tài khoản nông dân.
-- Quản lý tin tức.
-- Quản lý và xác minh tin marketplace.
-- Có quyền truy cập các API `/api/admin/...`.
-
-## Kiến Trúc
+## 2. Kiến trúc Hệ thống
+Mô hình hoạt động của dự án tuân theo chuẩn RESTful API với kiến trúc phân lớp:
 
 ```text
-Browser
-  |
-  | Static HTML/CSS/JS from public/
-  v
-Express Server
-  |
-  | REST API /api/...
-  v
-MySQL
-
-Express Server
-  |
-  | Axios + Cheerio
-  v
-Nguồn dữ liệu giá nông sản bên ngoài
+[ Trình duyệt Client ] (HTML/CSS/Vanilla JS)
+          |
+   (HTTP/REST API)
+          |
+[ Express Server ] (Node.js backend)  ---> [ Price Crawler Service (Axios + Cheerio) ]
+          |
+[ Cơ sở dữ liệu ] (MySQL)
 ```
 
-Điểm quan trọng:
+**Công nghệ sử dụng (Tech Stack):**
+- **Frontend:** HTML5, CSS3 (Custom CSS Framework), Vanilla JavaScript. Giao diện được thiết kế hiện đại (SaaS UI/UX) hoàn toàn responsive.
+- **Backend:** Node.js, Express.js.
+- **Cơ sở dữ liệu:** MySQL (Sử dụng module `mysql2` để kết nối, tự động tạo database và table nếu chưa tồn tại).
+- **Công cụ hỗ trợ:** Axios & Cheerio (Cào dữ liệu web tự động), JWT (Xác thực người dùng), Bcrypt (Mã hóa mật khẩu).
 
-- Frontend nằm trong `public/`.
-- Backend nằm trong `backend/src/`.
-- Backend chỉ serve thư mục `public/`, không serve toàn bộ repo.
-- API dùng đường dẫn tương đối `/api/...`, không phụ thuộc hardcode `localhost`.
-- File môi trường thật là `backend/.env` và không được commit.
-- `backend/node_modules` không được commit.
+---
 
-## Cấu Trúc Thư Mục
+## 3. Cấu trúc Dự án (Directory Structure)
 
 ```text
 AgriKnowledge_Web/
-|- public/
-|  |- index.html
-|  |- login.html
-|  |- register.html
-|  |- dashboard.html
-|  |- weather.html
-|  |- market-price.html
-|  |- marketplace.html
-|  |- news.html
-|  |- news-detail.html
-|  |- profile.html
-|  |- admin-products.html
-|  |- admin-farmers.html
-|  |- admin-news.html
-|  |- admin-marketplace.html
-|  |- css/
-|  |  |- style.css
-|  |- js/
-|     |- auth.js
-|     |- script.js
-|     |- weather.js
-|     |- market-price.js
-|     |- marketplace.js
-|- backend/
-|  |- src/
-|  |  |- config/
-|  |  |  |- db.js
-|  |  |  |- env.js
-|  |  |- controllers/
-|  |  |- middleware/
-|  |  |- routes/
-|  |  |- services/
-|  |  |- utils/
-|  |  |- server.js
-|  |- server.js
-|  |- .env.example
-|  |- package.json
-|  |- package-lock.json
-|- .editorconfig
-|- .gitignore
-|- README.md
+├── backend/                  # Mã nguồn Backend API Server
+│   ├── src/
+│   │   ├── config/           # Cấu hình Database & Environment
+│   │   ├── controllers/      # Chứa logic xử lý của từng API
+│   │   ├── middleware/       # Middleware xác thực JWT (Auth)
+│   │   ├── routes/           # Định nghĩa các Endpoints API
+│   │   ├── services/         # Dịch vụ Crawler giá nông sản
+│   │   ├── utils/            # Các hàm hỗ trợ (Parser)
+│   │   └── server.js         # Entry point chính của backend
+│   ├── .env.example          # File mẫu chứa biến môi trường
+│   └── package.json          # Quản lý thư viện backend
+├── public/                   # Thư mục Frontend (Static Files)
+│   ├── css/style.css         # CSS Framework System
+│   ├── js/                   # Vanilla JS xử lý logic client
+│   ├── index.html            # Landing Page
+│   ├── weather.html          # Tính năng Thời tiết
+│   ├── market-price.html     # Tính năng Thị trường & Giá
+│   ├── marketplace.html      # Sàn Giao thương
+│   ├── news.html             # Tin tức nông nghiệp
+│   ├── profile.html          # Hồ sơ cá nhân (Dùng chung)
+│   └── admin-*.html          # Các trang quản lý dành cho Admin
+└── README.md                 # Tài liệu Báo cáo
 ```
 
-Ghi chú:
+---
 
-- `backend/src/server.js` là entrypoint chính.
-- `backend/server.js` là wrapper để command cũ `node backend/server.js` vẫn chạy được.
-- Thư mục `docs/` đã được bỏ vì README hiện là tài liệu chính.
+## 4. Các Tính Năng Nổi Bật
 
-## Yêu Cầu Môi Trường
+### 4.1. Phân hệ Người Dùng (Nông dân / Thương lái)
+- **Xác thực & Phân quyền:** Đăng ký, Đăng nhập sử dụng JWT (JSON Web Tokens). Có thể tùy chỉnh hồ sơ cá nhân.
+- **Thời tiết & Môi trường (`weather.html`):** Cho phép xem dự báo thời tiết và các thông số (độ ẩm, gió, mưa) tích hợp thời gian thực.
+- **Thị trường & Giá (`market-price.html`):** Biểu đồ biến động giá nông sản được Crawler tự động từ các nguồn tin cậy, hỗ trợ so sánh giá nhiều loại nông sản.
+- **Giao thương (`marketplace.html`):** Nơi người dùng có thể đăng tin Thu mua hoặc Chào bán. Tích hợp bộ lọc đa dạng và chức năng xác thực tin đăng.
+- **Tin nhắn nội bộ (Messages):** Nhắn tin trực tiếp giữa người mua và người bán để thỏa thuận giá cả.
+- **Tin tức Nông nghiệp (`news.html`):** Đọc các bài viết, kiến thức canh tác, thông tin thị trường mới nhất.
 
-- Node.js 18+.
-- npm.
-- MySQL 8.x hoặc MySQL từ XAMPP/WAMP.
-- Trình duyệt hiện đại như Chrome, Edge hoặc Firefox.
+### 4.2. Phân hệ Quản trị viên (Admin)
+- **Truy cập:** Quản trị viên sử dụng thanh điều hướng độc lập. Có tính năng "Giao diện Người dùng" để chuyển đổi nhanh sang luồng người dùng để kiểm thử.
+- **Quản lý Nông dân (`admin-farmers.html`):** Xem, chỉnh sửa, cấp quyền và xóa tài khoản người dùng trên hệ thống.
+- **Quản lý Nông sản (`admin-products.html`):** Thêm mới và cấu hình các loại nông sản, gán link cắm mốc (Crawler Target) để hệ thống tự động cào giá cập nhật vào biểu đồ.
+- **Quản lý Tin tức (`admin-news.html`):** Đăng tải, chỉnh sửa, xóa bài viết chuyên đề nông nghiệp.
+- **Quản lý Giao thương (`admin-marketplace.html`):** Kiểm duyệt, duyệt hoặc xóa tin đăng trên sàn giao thương để đảm bảo môi trường thương mại minh bạch.
 
-Phiên bản Node mới hơn vẫn có thể chạy, nhưng nếu gặp lỗi dependency native như `bcrypt`, nên dùng Node LTS.
+---
 
-## Cài Đặt Và Chạy Dự Án
+## 5. Thiết kế Cơ sở dữ liệu (Database Schema)
+Hệ thống sử dụng cơ sở dữ liệu quan hệ (MySQL) với 5 bảng cốt lõi (Tables), được tự động khởi tạo qua module cấu hình `db.js`.
 
-### 1. Cài dependency backend
+### 5.1. Bảng `users` (Tài khoản người dùng)
+Lưu trữ thông tin xác thực và hồ sơ của tất cả các tài khoản trên hệ thống.
+| Cột | Kiểu dữ liệu | Khóa / Ràng buộc | Mô tả |
+| :--- | :--- | :--- | :--- |
+| `id` | INT | Primary Key, Auto Increment | Mã định danh người dùng |
+| `email` | VARCHAR(255) | UNIQUE, NOT NULL | Tên đăng nhập (Email) |
+| `password` | VARCHAR(255) | NOT NULL | Mật khẩu (đã được hash bcrypt) |
+| `display_name` | VARCHAR(255) | Default: 'Người dùng mới' | Tên hiển thị trên hồ sơ |
+| `role` | ENUM | 'farmer', 'admin', 'merchant' | Quyền hạn tài khoản |
+| `avatar` | VARCHAR(500) | NULL | URL ảnh đại diện |
+| `created_at` | TIMESTAMP | Default: CURRENT_TIMESTAMP | Ngày khởi tạo tài khoản |
 
+### 5.2. Bảng `products` (Danh mục Nông sản & Crawler)
+Quản lý các loại nông sản và lưu trữ cấu hình URL để công cụ Crawler tự động vào các trang web lấy giá thị trường.
+| Cột | Kiểu dữ liệu | Khóa / Ràng buộc | Mô tả |
+| :--- | :--- | :--- | :--- |
+| `id` | INT | Primary Key, Auto Increment | Mã định danh nông sản |
+| `key_name` | VARCHAR(50) | UNIQUE, NOT NULL | Mã tra cứu hệ thống (vd: 'lua') |
+| `name` | VARCHAR(255) | NOT NULL | Tên nông sản hiển thị |
+| `url` | VARCHAR(1024) | | URL mục tiêu để cào dữ liệu |
+| `color` | VARCHAR(50) | Default: '#3b82f6' | Mã màu đường viền biểu đồ |
+| `bg_color` | VARCHAR(50) | Default: 'rgba(...)' | Mã màu nền biểu đồ Chart.js |
+| `created_at` | TIMESTAMP | Default: CURRENT_TIMESTAMP | Ngày thêm vào danh mục |
+
+### 5.3. Bảng `news` (Tin tức Nông nghiệp)
+Lưu trữ nội dung các bản tin, kiến thức chuyên môn do Admin biên soạn.
+| Cột | Kiểu dữ liệu | Khóa / Ràng buộc | Mô tả |
+| :--- | :--- | :--- | :--- |
+| `id` | INT | Primary Key, Auto Increment | Mã định danh bài viết |
+| `admin_id` | INT | | Mã Admin biên soạn |
+| `author_name` | VARCHAR(255) | Default: 'Admin' | Tên tác giả |
+| `title` | VARCHAR(500) | NOT NULL | Tiêu đề bài viết |
+| `thumbnail_url` | VARCHAR(1024) | | URL ảnh bìa (thumbnail) |
+| `content` | LONGTEXT | NOT NULL | Nội dung chi tiết (HTML/Text) |
+| `is_published` | TINYINT(1) | Default: 1 (True) | Trạng thái hiển thị |
+| `created_at` | TIMESTAMP | Default: CURRENT_TIMESTAMP | Thời điểm đăng bài |
+| `updated_at` | TIMESTAMP | ON UPDATE CURRENT_TIMESTAMP | Cập nhật gần nhất |
+
+### 5.4. Bảng `marketplace_posts` (Sàn Giao thương)
+Lưu trữ các bài đăng có nhu cầu Mua hoặc Bán từ phía người nông dân và thương lái.
+| Cột | Kiểu dữ liệu | Khóa / Ràng buộc | Mô tả |
+| :--- | :--- | :--- | :--- |
+| `id` | INT | Primary Key, Auto Increment | Mã định danh tin đăng |
+| `user_id` | INT | Foreign Key -> `users(id)` | Mã người đăng tin (ON DELETE CASCADE) |
+| `post_type` | ENUM | 'sell', 'buy' | Loại tin đăng (Cần mua/Cần bán) |
+| `category` | VARCHAR(100) | | Phân loại (Trái cây, Ngũ cốc...) |
+| `product_name` | VARCHAR(255) | NOT NULL | Tên nông sản giao dịch |
+| `quantity` | VARCHAR(100) | | Số lượng / Khối lượng (vd: 50 Tấn) |
+| `location` | VARCHAR(255) | | Khu vực / Tỉnh thành giao dịch |
+| `description` | TEXT | | Mô tả chi tiết (Giá cả, chất lượng) |
+| `image_url` | LONGTEXT | | URL ảnh minh họa nông sản |
+| `is_verified` | BOOLEAN | Default: 0 (False) | Đánh dấu xác thực (Tin uy tín) |
+| `created_at` | TIMESTAMP | Default: CURRENT_TIMESTAMP | Thời điểm đăng tin |
+
+### 5.5. Bảng `messages` (Tin nhắn nội bộ)
+Lưu trữ nội dung trò chuyện (chat) trực tiếp giữa người dùng (người mua - người bán) trên nền tảng.
+| Cột | Kiểu dữ liệu | Khóa / Ràng buộc | Mô tả |
+| :--- | :--- | :--- | :--- |
+| `id` | INT | Primary Key, Auto Increment | Mã tin nhắn |
+| `sender_id` | INT | Foreign Key -> `users(id)` | Mã người gửi |
+| `receiver_id` | INT | Foreign Key -> `users(id)` | Mã người nhận |
+| `content` | TEXT | NOT NULL | Nội dung tin nhắn |
+| `is_read` | BOOLEAN | Default: 0 (False) | Đánh dấu đã đọc |
+| `created_at` | TIMESTAMP | Default: CURRENT_TIMESTAMP | Thời điểm gửi tin |
+
+### 5.6. Sơ đồ Thực thể Liên kết (ERD)
+
+Sơ đồ ERD dưới đây mô tả trực quan các thực thể và mối quan hệ giữa chúng trong hệ thống Cơ sở dữ liệu:
+
+```mermaid
+erDiagram
+    USERS ||--o{ MARKETPLACE_POSTS : "creates (1:N)"
+    USERS ||--o{ MESSAGES : "sends (1:N)"
+    USERS ||--o{ MESSAGES : "receives (1:N)"
+    USERS ||--o{ NEWS : "publishes as admin (1:N)"
+
+    USERS {
+        int id PK "Mã định danh"
+        varchar email "Tên đăng nhập"
+        varchar password "Mật khẩu mã hóa"
+        varchar display_name "Tên hiển thị"
+        enum role "farmer | admin | merchant"
+        varchar avatar "Ảnh đại diện"
+        timestamp created_at "Ngày tạo"
+    }
+
+    PRODUCTS {
+        int id PK "Mã định danh"
+        varchar key_name "Mã tra cứu (Unique)"
+        varchar name "Tên nông sản"
+        varchar url "URL cắm mốc crawler"
+        varchar color "Màu viền biểu đồ"
+        varchar bg_color "Màu nền biểu đồ"
+        timestamp created_at "Ngày cấu hình"
+    }
+
+    NEWS {
+        int id PK "Mã bài viết"
+        int admin_id FK "Mã người đăng"
+        varchar author_name "Tên tác giả"
+        varchar title "Tiêu đề tin"
+        varchar thumbnail_url "Ảnh bìa"
+        longtext content "Nội dung"
+        tinyint is_published "Trạng thái hiển thị"
+        timestamp created_at "Thời gian tạo"
+        timestamp updated_at "Thời gian cập nhật"
+    }
+
+    MARKETPLACE_POSTS {
+        int id PK "Mã tin đăng"
+        int user_id FK "Người đăng tin"
+        enum post_type "sell | buy"
+        varchar category "Phân loại"
+        varchar product_name "Tên nông sản"
+        varchar quantity "Số lượng"
+        varchar location "Vị trí"
+        text description "Mô tả chi tiết"
+        longtext image_url "Ảnh đính kèm"
+        boolean is_verified "Tin xác thực"
+        timestamp created_at "Thời gian đăng"
+    }
+
+    MESSAGES {
+        int id PK "Mã tin nhắn"
+        int sender_id FK "Người gửi"
+        int receiver_id FK "Người nhận"
+        text content "Nội dung tin nhắn"
+        boolean is_read "Trạng thái đọc"
+        timestamp created_at "Thời gian gửi"
+    }
+```
+
+---
+
+## 6. Danh Sách API (RESTful Endpoints)
+Base URL: `http://localhost:3000/api`
+
+**Authentication**
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `PUT  /api/auth/profile`
+
+**Public Data (Prices & News)**
+- `GET /api/prices` (Crawler dữ liệu trả về mảng giá)
+- `GET /api/news` (Lấy danh sách tin tức)
+- `GET /api/news/:id`
+
+**Marketplace & Messages**
+- `GET, POST, PUT, DELETE /api/marketplace`
+- `GET /api/messages/conversations`
+- `POST /api/messages`
+
+**Admin Resource Management**
+- `GET, POST, PUT, DELETE /api/admin/products`
+- `GET, POST, PUT, DELETE /api/admin/farmers`
+- `GET, POST, PUT, DELETE /api/admin/news` (Via `news/admin/...`)
+
+---
+
+## 7. Hướng dẫn Cài đặt & Chạy Dự án
+
+**Yêu cầu hệ thống:**
+- Node.js (v18 trở lên)
+- npm hoặc yarn
+- MySQL Server (Có thể sử dụng XAMPP/WAMP để khởi chạy dịch vụ MySQL)
+
+**Bước 1: Cài đặt thư viện**
+Di chuyển vào thư mục backend và cài đặt:
 ```bash
 cd backend
 npm install
 ```
 
-### 2. Tạo file môi trường
-
-Tạo file `backend/.env` dựa trên `backend/.env.example`.
-
-```bash
-copy .env.example .env
+**Bước 2: Cấu hình Môi trường**
+Tạo file `.env` trong thư mục `backend/` dựa trên `.env.example`:
+```env
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=            # Mật khẩu MySQL (để trống nếu dùng XAMPP mặc định)
+DB_NAME=agriknowledge
+DB_PORT=3306
+JWT_SECRET=super_secret_key_for_jwt
+PORT=3000
 ```
 
-Trên PowerShell có thể dùng:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-Sau đó chỉnh lại thông tin database và `JWT_SECRET`.
-
-### 3. Chạy backend
-
-Cách khuyến nghị:
-
+**Bước 3: Khởi chạy Server**
+Hệ thống được lập trình để tự động tạo Database (`agriknowledge`) và các Tables (bảng) khi chạy lần đầu:
 ```bash
-cd backend
 npm start
 ```
+*Ghi chú: Bạn cũng có thể dùng `node src/server.js` từ thư mục backend.*
 
-Cách tương thích với command cũ:
-
-```bash
-node backend/server.js
-```
-
-### 4. Mở ứng dụng
-
+**Bước 4: Sử dụng Ứng dụng**
+Mở trình duyệt và truy cập đường dẫn:
 ```text
 http://localhost:3000
 ```
 
-Một số trang thường dùng:
-
-- `http://localhost:3000/index.html`
-- `http://localhost:3000/login.html`
-- `http://localhost:3000/register.html`
-- `http://localhost:3000/dashboard.html`
-- `http://localhost:3000/marketplace.html`
-- `http://localhost:3000/admin-products.html`
-
-## Scripts
-
-Chạy trong thư mục `backend/`.
-
-```bash
-npm start
-```
-
-Chạy server.
-
-```bash
-npm run dev
-```
-
-Hiện đang tương đương `npm start`.
-
-```bash
-npm test
-```
-
-Kiểm tra cú pháp entrypoint backend bằng `node --check`.
-
-```bash
-npm run check
-```
-
-Kiểm tra cú pháp `backend/src/server.js`.
-
-## Cấu Hình Môi Trường
-
-File mẫu: `backend/.env.example`.
-
-```env
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=your_password
-DB_NAME=agriknowledge
-DB_PORT=3306
-JWT_SECRET=replace_with_a_strong_secret
-PORT=3000
-```
-
-Ý nghĩa:
-
-- `DB_HOST`: host MySQL.
-- `DB_USER`: user MySQL.
-- `DB_PASSWORD`: mật khẩu MySQL.
-- `DB_NAME`: tên database ứng dụng.
-- `DB_PORT`: port MySQL, thường là `3306`.
-- `JWT_SECRET`: secret để ký JWT, bắt buộc phải đặt giá trị mạnh.
-- `PORT`: port chạy web server, mặc định `3000`.
-
-Không commit `backend/.env`.
-
-Nếu secret hoặc mật khẩu database từng bị chia sẻ ra ngoài, hãy đổi lại giá trị mới.
-
-## Tài Khoản Và Phân Quyền
-
-Hệ thống có 3 role:
-
-- `farmer`: nông dân.
-- `merchant`: thương lái.
-- `admin`: quản trị viên.
-
-Người dùng thường có thể đăng ký từ `register.html`.
-
-Admin có thể được tạo qua API:
-
-```http
-POST /api/auth/create-admin
-Content-Type: application/json
-
-{
-  "email": "admin1@agri.com",
-  "password": "123456",
-  "display_name": "Quản trị viên"
-}
-```
-
-Sau khi đăng nhập, client lưu JWT trong `localStorage` và gửi token bằng header:
-
-```http
-Authorization: Bearer <token>
-```
-
-## API
-
-Base URL khi chạy local:
-
-```text
-http://localhost:3000/api
-```
-
-Frontend dùng URL tương đối `/api/...`, nên khi deploy cùng server sẽ không cần đổi cấu hình.
-
-### Auth
-
-```http
-POST /api/auth/register
-POST /api/auth/login
-POST /api/auth/create-admin
-PUT  /api/auth/profile
-```
-
-`PUT /api/auth/profile` yêu cầu JWT.
-
-### Prices
-
-```http
-GET /api/prices
-```
-
-Lấy dữ liệu giá nông sản. Backend có cache để giảm số lần gọi nguồn bên ngoài.
-
-### News
-
-Public:
-
-```http
-GET /api/news
-GET /api/news/:id
-```
-
-Admin:
-
-```http
-GET    /api/news/admin/list
-GET    /api/news/admin/:id
-POST   /api/news
-PUT    /api/news/:id
-DELETE /api/news/:id
-```
-
-Các route admin yêu cầu JWT admin.
-
-### Marketplace
-
-```http
-GET    /api/marketplace
-POST   /api/marketplace
-PUT    /api/marketplace/:id
-DELETE /api/marketplace/:id
-PUT    /api/marketplace/:id/verify
-```
-
-Ghi chú:
-
-- `GET /api/marketplace` là public.
-- Tạo, sửa, xóa tin yêu cầu JWT.
-- Xác minh tin yêu cầu admin.
-
-### Messages
-
-```http
-GET  /api/messages/conversations
-GET  /api/messages/unread-count
-GET  /api/messages/:partnerId
-POST /api/messages
-```
-
-Tất cả route messages yêu cầu JWT.
-
-### Admin
-
-```http
-GET    /api/admin/dashboard
-GET    /api/admin/products
-POST   /api/admin/products
-PUT    /api/admin/products/:id
-DELETE /api/admin/products/:id
-GET    /api/admin/farmers
-POST   /api/admin/farmers
-PUT    /api/admin/farmers/:id
-DELETE /api/admin/farmers/:id
-```
-
-Tất cả route `/api/admin/...` yêu cầu JWT admin.
-
-## Database
-
-Backend tự tạo database và bảng khi khởi động nếu chưa tồn tại.
-
-Các bảng chính:
-
-- `users`: tài khoản, mật khẩu đã hash, role, avatar.
-- `products`: danh sách nông sản để theo dõi giá.
-- `news`: bài viết tin tức.
-- `marketplace_posts`: tin mua/bán nông sản.
-- `messages`: tin nhắn giữa người dùng.
-
-File xử lý kết nối và khởi tạo database:
-
-```text
-backend/src/config/db.js
-```
-
-## Frontend
-
-Frontend không có bước build.
-
-Các file HTML nằm trong `public/` vì Express serve thư mục này trực tiếp:
-
-```text
-public/index.html
-public/dashboard.html
-public/marketplace.html
-...
-```
-
-CSS dùng chung:
-
-```text
-public/css/style.css
-```
-
-JavaScript dùng chung và theo từng module:
-
-```text
-public/js/script.js
-public/js/auth.js
-public/js/weather.js
-public/js/market-price.js
-public/js/marketplace.js
-```
-
-## Backend
-
-Backend chia theo các lớp chính:
-
-- `routes/`: khai báo endpoint.
-- `controllers/`: xử lý request/response.
-- `services/`: logic nghiệp vụ phụ trợ, ví dụ crawl giá.
-- `middleware/`: xác thực JWT và kiểm tra quyền admin.
-- `config/`: cấu hình môi trường và database.
-- `utils/`: hàm tiện ích nhỏ.
-
-## Quy Tắc Phát Triển
-
-- Không commit `backend/.env`.
-- Không commit `backend/node_modules`.
-- Không đặt secret trực tiếp trong source code.
-- Khi thêm API mới, khai báo route trong `backend/src/routes/` và xử lý trong `backend/src/controllers/`.
-- Khi thêm file frontend mới, đặt trong `public/`.
-- Khi gọi API từ frontend, dùng `/api/...`, không hardcode `http://localhost:3000/api/...`.
-- Khi đổi schema database, cập nhật logic khởi tạo trong `backend/src/config/db.js`.
-- Sau khi sửa backend, chạy:
-
-```bash
-cd backend
-npm test
-```
-
-## Git
-
-Repo đã có `.gitignore` để loại trừ:
-
-- `node_modules/`
-- `backend/node_modules/`
-- `.env`
-- `backend/.env`
-- log, build output và file editor/OS.
-
-Nếu lỡ cài dependency, chỉ commit `package.json` và `package-lock.json`, không commit `node_modules`.
-
-## Troubleshooting
-
-### Lỗi `Cannot find module backend/server.js`
-
-Command cũ là:
-
-```bash
-node backend/server.js
-```
-
-Repo hiện đã có wrapper `backend/server.js`, nên command này vẫn chạy được. Cách khuyến nghị hơn là:
-
-```bash
-cd backend
-npm start
-```
-
-### Lỗi thiếu `JWT_SECRET`
-
-Tạo `backend/.env` và đảm bảo có dòng:
-
-```env
-JWT_SECRET=replace_with_a_strong_secret
-```
-
-### Lỗi kết nối MySQL
-
-Kiểm tra:
-
-- MySQL đã chạy chưa.
-- `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_PORT` trong `backend/.env` đúng chưa.
-- User MySQL có quyền tạo database không.
-
-### PowerShell chặn `npm`
-
-Nếu PowerShell báo không chạy được `npm.ps1`, dùng:
-
-```powershell
-npm.cmd start
-```
-
-hoặc:
-
-```powershell
-npm.cmd test
-```
-
-### Port 3000 đã được dùng
-
-Đổi `PORT` trong `backend/.env`:
-
-```env
-PORT=3001
-```
-
-Sau đó mở:
-
-```text
-http://localhost:3001
-```
-
-## Trạng Thái Hiện Tại
-
-Dự án hiện phù hợp cho demo, học tập và phát triển nội bộ. Nếu triển khai production, nên bổ sung:
-
-- HTTPS.
-- Rate limiting.
-- Validation chặt hơn cho request body.
-- Logging chuẩn hơn.
-- Migration database riêng thay vì auto-migrate trong runtime.
-- Test tự động cho controller/service.
-- Cơ chế upload ảnh thay vì lưu ảnh base64 dài trong database.
+---
+*Báo cáo được hoàn thiện dựa trên quá trình xây dựng thực tế của dự án.*

@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (data.user.role === 'admin') {
                         window.location.href = 'admin-products.html';
                     } else {
-                        window.location.href = 'dashboard.html';
+                        window.location.href = 'weather.html';
                     }
                 } else {
                     alert(data.error || 'Đăng nhập thất bại');
